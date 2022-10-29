@@ -1,8 +1,38 @@
 .roomList {
   width: 80px;
+  min-width: 80px;
   height: 100%;
 
   display: flex;
   flex-flow: column nowrap;
   align-items: center;
+}
+
+.mainLogo {
+  cursor: pointer;
+  margin-top: 5px;
+  background-color: var(--color-white);
+  border-radius: 50%;
+  width: 55px;
+  height: 55px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  transition: all 200ms ease-in;
+  font-size: var(--font-medium);
+}
+.mainLogo:hover {
+  background-color: var(--color-light-blue);
+  color: var(--color-white);
+  border-radius: 30%;
+}
+
+.line {
+  background-color: var(--color-light-black);
+  margin: 10px 0 0 0;
+  border: none;
+  width: 40px;
+  height: 3px;
 }
