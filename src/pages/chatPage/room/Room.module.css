@@ -1,0 +1,27 @@
+.container {
+  background-color: var(--color-light-white);
+  border-top-left-radius: 1%;
+
+  font-family: 'Noto Sans CJK KR';
+  font-style: normal;
+  color: var(--color-light-black);
+  font-weight: normal;
+
+  flex: 1;
+  height: 100%;
+  overflow: hidden;
+}
+
+.container_dark {
+  background-color: var(--color-black);
+  border-top-left-radius: 1%;
+
+  font-family: 'Noto Sans CJK KR';
+  font-style: normal;
+  color: var(--color-light-white);
+  font-weight: normal;
+
+  flex: 1;
+  height: 100%;
+  overflow: hidden;
+}
