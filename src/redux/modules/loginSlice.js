@@ -1,11 +1,10 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import instance from '../../shared/request';
-import axios from 'axios';
+import instance from '../../shared/router/request';
 
 // 다시 확인
 const initialState = {
   login: {
-    nickname: '',
+    email: '',
     password: '',
     passwordConfirm: ''
   },

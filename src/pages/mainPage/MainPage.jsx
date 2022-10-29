@@ -1,24 +1,66 @@
-import React from "react"
+import React,{ useState} from "react"
 import { useNavigate } from "react-router-dom/dist"
-
+import { useDispatch } from "react-redux";
+import { memberLogin } from "../../redux/modules/loginSlice";
 
 export default function MainPage() {
-   const navigate = useNavigate
+  const [email, setEmail] = useState();
+  const [password, setPassword] = useState();
+
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const onChangeEmail = (e) => {
+    const {value} = e.target;
+    setEmail(value);
+  }
+
+  const onChangePassword = (e) => {
+    const {value} = e.target;
+    setPassword(value);
+  }
+
+  const onSubmitHandler = (e) => {
+    e.preventDefault();
+    dispatch(memberLogin({
+      email,
+      password
+    }));
+    setEmail('');
+    setPassword('')
+
+    if(password.length < 4 || password.length > 20) {
+      alert("4자리 ~ 20자리 이내로 입력하세요")
+      return false;
+    }
+  }
 
   return (
     
       <div className="loginPage">
-        <div className="loginBox">
+        <form className="loginBox" onSubmit={onSubmitHandler}>
           <div>
             <p>Discode</p>
-            <input className="loginInput"/>
-            <input className="loginInput"/>
+            <input
+              className="loginInput"
+              value={email}
+              type='text'
+              onChange={onChangeEmail}
+              placeholder='이메일을 입력하세요.'
+              />
+            <input
+              className="loginInput"
+              value={password}
+              type='password'
+              onChange={onChangePassword}
+              placeholder='비밀번호를 입력하세요'
+              />
             <button className="loginButton">로그인</button>
           </div>
           <p onClick={navigate('/signup')}>아직 회원이 아니신가요?</p>
-        </div>
+        </form>
       </div>
-
+  
   )
 
 }
