@@ -1,0 +1,13 @@
+.wrapper {
+  background-color: var(--color-dark-white);
+  display: flex;
+  flex-flow: column nowrap;
+  height: 100vh;
+}
+
+.box {
+  display: flex;
+  flex-flow: row nowrap;
+  width: 100%;
+  flex: 1;
+}
