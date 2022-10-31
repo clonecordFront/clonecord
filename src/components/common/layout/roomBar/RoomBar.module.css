@@ -8,13 +8,13 @@
   align-items: center;
 }
 
-.mainLogo {
+.Logo {
   cursor: pointer;
   margin-top: 5px;
   background-color: var(--color-white);
   border-radius: 50%;
-  width: 55px;
-  height: 55px;
+  width: 50px;
+  height: 50px;
 
   display: flex;
   justify-content: center;
@@ -23,7 +23,8 @@
   transition: all 200ms ease-in;
   font-size: var(--font-medium);
 }
-.mainLogo:hover {
+
+.main:hover {
   background-color: var(--color-light-blue);
   color: var(--color-white);
   border-radius: 30%;
@@ -35,4 +36,21 @@
   border: none;
   width: 40px;
   height: 3px;
+}
+
+.plus:hover {
+  background-color: var(--color-strong-green);
+  color: var(--color-white);
+  border-radius: 30%;
+}
+
+ul {
+  margin: 0;
+  padding: 0;
+  margin-bottom: 5px;
+}
+
+.temp:hover {
+  background-color: yellow;
+  border-radius: 30%;
 }
