@@ -1,12 +1,11 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import instance from '../../shared/router/request';
+import instance from '../../shared/Request';
 
-// 다시 확인
+// http://13.124.142.195/
 const initialState = {
   login: {
     email: '',
     password: '',
-    passwordConfirm: ''
   },
   isLoading: false,
   error: null,
@@ -15,26 +14,23 @@ const initialState = {
 export const memberLogin = createAsyncThunk(
   'MEMBER_LOGIN',
   async (payload, thunkAPI) => {
-
+    console.log(payload)
     try {
       const config = {
         headers: {
           'Content-Type': 'application/json',
         },
-
       };
-
-      const { data } = await instance.post('주소', payload, config) // 주소 넣어줘야함
-
+      const { data } = await instance.post('/api/members/login', payload, config) 
         .then((token) => {
           if (token.data.success) {
             localStorage.setItem('Authorization', token.request.getResponseHeader('authorization'));
             localStorage.setItem('Refresh-Token', token.request.getResponseHeader('refresh-Token'));
-            alert('로그인에 성공하였습니다!')
+            alert('로그인에 성공했습니다.')
             window.location.replace('/');
           }
         }).catch(error => {
-          alert("아이디와 비밀번호를 확인해주세요!");
+          alert("아이디와 비밀번호를 확인하세요");
         })
     } catch (error) {
     }
@@ -42,7 +38,7 @@ export const memberLogin = createAsyncThunk(
 );
 
 
-const loginSlice = createSlice({
+const LoginSlice = createSlice({
   name: 'members',
   initialState,
   reducers: {},
@@ -62,4 +58,4 @@ const loginSlice = createSlice({
   },
 });
 
-export default loginSlice.reducer;
+export default LoginSlice.reducer;

@@ -1,7 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit';
+import members from '../modules/LoginSlice'
+
 
 const store = configureStore({
-  reducer: {},
+  reducer: {
+    members,
+  },
   devTools: process.env.NODE_ENV !== 'production',
 });
 
