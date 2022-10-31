@@ -11,7 +11,7 @@ export const __memberLogin = createAsyncThunk(
           'Content-Type': 'application/json',
         },
       };
-      const { data, headers} = await axios.post('https://code99-dev.pyuri.dev/api/members/login', payload, config);
+      const { data, headers} = await axios.post('http://13.124.142.195/api/members/login', payload, config);
       console.log(data)
       sessionStorage.setItem('Authorization', headers.authorization)
       sessionStorage.setItem('Refresh-Token', headers['refresh-token'])
@@ -33,7 +33,7 @@ export const __memberLogout = createAsyncThunk(
           'Refresh-Token': sessionStorage.getItem('Refresh-Token')
         },
       };
-      const { data } = await axios.post("https://code99-dev.pyuri.dev/api/auth/members/logout", payload, config);
+      const { data } = await axios.post("http://13.124.142.195/api/auth/members/logout", payload, config);
       return thunkAPI.fulfillWithValue(data);
     } catch (error) {
       return thunkAPI.rejectWithValue(error);

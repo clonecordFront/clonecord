@@ -23,9 +23,8 @@ export default function Join() {
         }
       )
       .then((response) => {
-        localStorage.setItem('token', response.data.jwt);
+        sessionStorage.setItem('token', response.data.jwt);
         alert('회원가입에 성공했습니다.');
-        console.log('User profile', response.data.jwt);
       })
       .catch((error) => {
         alert(error.response.data.message);
@@ -45,7 +44,7 @@ export default function Join() {
         }
       )
       .then((response) => {
-        localStorage.setItem('token', response.data.jwt);
+        sessionStorage.setItem('token', response.data.jwt);
 
         if (response.data.success === true) {
           return alert('사용할 수 있는 닉네임입니다.');
@@ -73,7 +72,7 @@ export default function Join() {
         }
       )
       .then((response) => {
-        localStorage.setItem('token', response.data.jwt);
+        sessionStorage.setItem('token', response.data.jwt);
         if (response.data.success === true) {
           return alert('사용할 수 있는 이메일입니다.');
         } else {
@@ -88,15 +87,14 @@ export default function Join() {
 
   const nameOnChangeHandler = (e) => {
     setName(e.target.value);
-    console.log('이름', e.target.value);
   };
 
   const nameChekOnClickHandler = () => {
     nickNameCheck();
   };
+  
   const emailOnChangeHandler = (e) => {
     setEmail(e.target.value);
-    console.log('메일', e.target.value);
   };
 
   const emailChekOnClickHandler = () => {
@@ -104,12 +102,10 @@ export default function Join() {
   };
   const passwordOnChangeHandler = (e) => {
     setPassword(e.target.value);
-    console.log('비밀번호', e.target.value);
   };
 
   const passwordCheckOnChangeHandler = (e) => {
     setPasswordChck(e.target.value);
-    console.log('비밀번호확인', e.target.value);
   };
 
   const joinOnClickHandler = () => {

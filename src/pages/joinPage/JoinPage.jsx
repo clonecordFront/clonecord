@@ -5,8 +5,6 @@ import React from 'react';
 import RoomBar from '../../components/common/layout/roomBar/RoomBar';
 export default function JoinPage() {
   return (
-    <Layout>
       <Join />
-    </Layout>
   );
 }
