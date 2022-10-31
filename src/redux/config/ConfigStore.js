@@ -1,11 +1,8 @@
 import { configureStore } from '@reduxjs/toolkit';
-import members from '../modules/LoginSlice'
-
+import chatReducer from '../modules/ChatSlice';
 
 const store = configureStore({
-  reducer: {
-    members,
-  },
+  reducer: { chat: chatReducer, members },
   devTools: process.env.NODE_ENV !== 'production',
 });
 

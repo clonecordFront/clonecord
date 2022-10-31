@@ -1,0 +1,36 @@
+.box {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: flex-start;
+  margin-bottom: 15px;
+}
+
+.left {
+  background-color: transparent;
+  margin-right: 10px;
+}
+.imgBox {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin-top: 5px;
+}
+.profile_img {
+  width: 40px;
+  height: 40px;
+}
+
+.right {
+  display: flex;
+  flex-flow: column nowrap;
+}
+
+.nickname {
+  font-weight: bold;
+  margin-right: 10px;
+}
+.date {
+  font-size: var(--font-micro);
+  color: var(--color-dark-white);
+}
