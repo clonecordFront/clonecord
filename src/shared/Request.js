@@ -28,7 +28,7 @@ instance.interceptors.response.use(
     const code = error.code;
     //const status = error.response?.status;
 
-    if (code === 'ECONNABORTED' || error.response.status === 408) {
+    if (code === 'ECONNABORTED' || error.status === 408) {
       alert('요청이 만료되었습니다.');
     }
     return Promise.reject(error);

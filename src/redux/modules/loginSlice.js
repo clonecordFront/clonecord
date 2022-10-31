@@ -1,61 +1,71 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import instance from '../../shared/Request';
+import axios from "axios";
 
-// http://13.124.142.195/
-const initialState = {
-  login: {
-    email: '',
-    password: '',
-  },
-  isLoading: false,
-  error: null,
-};
-
-export const memberLogin = createAsyncThunk(
+export const __memberLogin = createAsyncThunk(
   'MEMBER_LOGIN',
   async (payload, thunkAPI) => {
-    console.log(payload)
     try {
       const config = {
         headers: {
           'Content-Type': 'application/json',
         },
       };
-      const { data } = await instance.post('/api/members/login', payload, config) 
-        .then((token) => {
-          if (token.data.success) {
-            localStorage.setItem('Authorization', token.request.getResponseHeader('authorization'));
-            localStorage.setItem('Refresh-Token', token.request.getResponseHeader('refresh-Token'));
-            alert('로그인에 성공했습니다.')
-            window.location.replace('/');
-          }
-        }).catch(error => {
-          alert("아이디와 비밀번호를 확인하세요");
-        })
-    } catch (error) {
+      const { data, headers} = await axios.post('https://code99-dev.pyuri.dev/api/members/login', payload, config);
+      console.log(data)
+      sessionStorage.setItem('Authorization', headers.authorization)
+      sessionStorage.setItem('Refresh-Token', headers['refresh-token'])
+      return thunkAPI.fulfillWithValue(data);
+      } catch (error) {
+        alert(error.response.data.message);
     }
   }
 );
 
+export const __memberLogout = createAsyncThunk(
+  "MEMBER_LOGOUT",
+  async (payload, thunkAPI) => {
+    try {
+      const config = {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': sessionStorage.getItem('Authorization'),
+          'Refresh-Token': sessionStorage.getItem('Refresh-Token')
+        },
+      };
+      const { data } = await axios.post("https://code99-dev.pyuri.dev/api/auth/members/logout", payload, config);
+      return thunkAPI.fulfillWithValue(data);
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error);
+    }
+  }
+  );
 
-const LoginSlice = createSlice({
-  name: 'members',
+const initialState = {
+  user: {
+    data :{},
+    isLoading: false,
+    error: null,
+  },
+};
+
+export const loginSlice = createSlice({
+  name: 'user',
   initialState,
   reducers: {},
   extraReducers: {
-    [memberLogin.pending]: (state) => {
-      state.isLoading = true;
+    [__memberLogin.pending]: (state) => {
+      state.user.isLoading = true;
     },
-
-    [memberLogin.fulfilled]: (state, action) => {
-      state.isLoading = false;
-      state.login = action.payload;
+    [__memberLogin.fulfilled]: (state, action) => {
+      state.user.isLoading = false;
+      state.user.data = action.payload.data;
     },
-    [memberLogin.rejected]: (state, action) => {
-      state.isLoading = false;
+    [__memberLogin.rejected]: (state, action) => {
+      state.user.isLoading = false;
       state.error = action.payload;
     },
   },
 });
 
-export default LoginSlice.reducer;
+export default loginSlice.reducer;
