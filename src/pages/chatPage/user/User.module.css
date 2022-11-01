@@ -1,0 +1,19 @@
+.box {
+  display: flex;
+  align-items: center;
+
+  margin: 0px 0px 12px 5px;
+}
+
+.imgBox {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  overflow: hidden;
+
+  margin-right: 10px;
+}
+.profile_img {
+  width: 30px;
+  height: 30px;
+}

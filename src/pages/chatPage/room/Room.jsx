@@ -11,9 +11,12 @@ import Chat from '../chat/Chat';
 import styles from './Room.module.css';
 import RoomHeader from './roomHeader/RoomHeader';
 
-import { __addChat } from '../../../redux/modules/ChatSlice';
+import { ADD_CHAT } from '../../../redux/modules/ChatSlice';
 
-export default function Room() {
+import placeholderPath from '../../../img/profile_placeholder.png';
+import User from '../user/User';
+
+export default function Room({ roomId }) {
   const { stompClient } = useContext(StompContext);
   const { isUserDisplay } = useContext(UserDisplayContext);
 
@@ -49,26 +52,31 @@ export default function Room() {
   const chats = useSelector((state) => state.chat.chats);
   const onSubmitHandler = (e) => {
     e.preventDefault();
-    dispatch(
-      __addChat({
-        id: null,
+
+    if (chatInput === '') return;
+
+    stompClient.send(
+      '/app/chat/message',
+      {},
+      JSON.stringify({
         type: 'TALK',
         roomId: '1',
-        sender: 'FrontMan',
+        sender: 'test',
         message: chatInput,
       })
     );
+
     setChatInput('');
-    prepareScroll();
   };
 
   // TODO: Stomp Control
   const onMessageReceived = (payload) => {
+    console.log('Received!');
     const payloadData = JSON.parse(payload.body);
     console.log(payload);
     switch (payloadData.type) {
       case 'TALK':
-        dispatch(__addChat(payloadData));
+        dispatch(ADD_CHAT(payloadData));
         prepareScroll();
         break;
       default:
@@ -115,7 +123,23 @@ export default function Room() {
       <div className={styles.channelBox}>
         <div className={styles.voice}>
           <div className={styles.voiceList}>VOICE CHANNEL</div>
-          <div className={styles.profile}>PROFILE ZONE</div>
+          <div className={styles.profile}>
+            <div className={styles.profileInfo}>
+              <div className={styles.imgBox}>
+                <img
+                  className={styles.profile_img}
+                  src={placeholderPath}
+                  alt='profile_picture'
+                />
+              </div>
+              <p>FrontMan</p>
+            </div>
+            <div className={styles.profileBtnSet}>
+              <i className='fa-solid fa-microphone'></i>
+              <i className='fa-solid fa-headphones'></i>
+              <i className='fa-solid fa-gear'></i>
+            </div>
+          </div>
         </div>
 
         <div className={styles.chat}>
@@ -124,12 +148,18 @@ export default function Room() {
             className={styles.chatBox}
             style={{ maxHeight: chatboxHeight }}
           >
-            CHANNEL FIRST CHAT
+            <div className={styles.firstChat}>
+              <h2>채널명에</h2>
+              <h2>오신 것을 환영합니다</h2>
+              <p>이 채널이 시작된 곳이에요.</p>
+            </div>
+
             {/* 특정 채털의 chat list mapping */}
             {/* <Chat /> */}
-            {chats.data.map((chat) => (
-              <Chat chat={chat} />
-            ))}
+            {chats.data[1] &&
+              chats.data[1].map((chat, index) => (
+                <Chat key={index} chat={chat} />
+              ))}
           </ul>
 
           <div className={styles.inputBox}>
@@ -156,7 +186,21 @@ export default function Room() {
           className={styles.user}
           style={{ width: isUserDisplay ? '170px' : '0px' }}
         >
-          USER LIST
+          <span className={styles.userListText}>온라인 - 4</span>
+          <ul>
+            <User />
+            <User />
+            <User />
+            <User />
+          </ul>
+
+          <span className={styles.userListText}>오프라인 - 4</span>
+          <ul>
+            <User />
+            <User />
+            <User />
+            <User />
+          </ul>
         </div>
       </div>
     </section>

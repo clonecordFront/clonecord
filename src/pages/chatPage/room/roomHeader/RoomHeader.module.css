@@ -19,12 +19,26 @@
   font-size: var(--font-regular);
   font-weight: bold;
   padding-left: 30px;
+  padding-right: 20px;
   width: 250px;
   min-width: 250px;
   height: 100%;
   display: flex;
+  justify-content: space-between;
   align-items: center;
+
+  cursor: pointer;
+  transition: all 200ms ease-in;
 }
+
+.name:hover {
+  background-color: var(--color-white);
+}
+
+.nameBtn {
+  cursor: pointer;
+}
+
 .btnSet {
   display: flex;
   flex-flow: row nowrap;

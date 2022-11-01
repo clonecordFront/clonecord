@@ -4,6 +4,7 @@ import MainPage from '../../pages/mainPage/MainPage';
 import ChatPage from '../../pages/chatPage/ChatPage';
 import LoginPage from '../../pages/loginPage/LoginPage';
 import JoinPage from '../../pages/joinPage/JoinPage';
+import InvitePage from '../../pages/invitePage/InvitePage';
 
 const Router = () => {
   return (
@@ -11,7 +12,7 @@ const Router = () => {
       <Routes>
         <Route path='/' element={<MainPage />} />
         <Route path='/channel/:id' element={<ChatPage />} />
-        <Route path='/login' element={<LoginPage/>} />
+        <Route path='/invite/:id' element={<InvitePage />} />
         {/* <Route path='*' element={<MainPage />} /> */}
         <Route path="/join" element={<JoinPage />} />
       </Routes>
