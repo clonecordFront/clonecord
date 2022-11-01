@@ -14,17 +14,16 @@ export const __getChats = createAsyncThunk(
   }
 );
 
-export const __addChat = createAsyncThunk('ADD_CHAT', async (arg, thunkAPI) => {
-  try {
-    return thunkAPI.fulfillWithValue(arg);
-  } catch (error) {
-    return thunkAPI.rejectWithValue(error.code);
-  }
-});
-
 const initialState = {
-  chats: {
+  //?
+  channels: {
     data: [],
+    isLoading: false,
+    error: null,
+  },
+  //! chats. data객체의 key:channel Id, value: 해당 채널 채팅기록 배열
+  chats: {
+    data: {},
     isLoading: false,
     error: null,
   },
@@ -36,27 +35,27 @@ export const chatSlice = createSlice({
   reducers: {
     CLEAR_CHATS: (state) => {
       state.chats = {
-        data: [],
+        data: {},
         isLoading: false,
         error: null,
       };
     },
+    ADD_CHAT: (state, action) => {
+      console.log(action.payload.roomId, action.payload);
+      if (state.chats.data[action.payload.roomId]) {
+        state.chats.data[action.payload.roomId] = [
+          ...state.chats.data[action.payload.roomId],
+          action.payload,
+        ];
+      } else {
+        //console.log('Empty! Insert first chat');
+        state.chats.data[action.payload.roomId] = [action.payload];
+      }
+      //console.log(state.chats.data[action.payload.roomId]);
+    },
   },
-  extraReducers: {
-    //? 접수받은 채팅 추가하기
-    [__addChat.pending]: (state) => {
-      state.chats.isLoading = true;
-    },
-    [__addChat.fulfilled]: (state, action) => {
-      state.chats.data = state.chats.data.concat(action.payload);
-      state.chats.isLoading = false;
-    },
-    [__addChat.rejected]: (state, action) => {
-      state.chats.error = action.payload;
-      state.chats.isLoading = false;
-    },
-  },
+  extraReducers: {},
 });
 
-export const { CLEAR_CHATS } = chatSlice.actions;
+export const { CLEAR_CHATS, ADD_CHAT } = chatSlice.actions;
 export default chatSlice.reducer;

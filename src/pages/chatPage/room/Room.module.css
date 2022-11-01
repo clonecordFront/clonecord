@@ -119,4 +119,49 @@
   background-color: #ebedef;
   height: 60px;
   min-height: 60px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 0 10px;
+}
+.profileInfo {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.imgBox {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin-right: 5px;
+}
+.profile_img {
+  width: 30px;
+  height: 30px;
+}
+
+.profileBtnSet {
+  font-size: var(--font-small);
+  width: 70px;
+
+  display: flex;
+  justify-content: space-between;
+}
+
+.firstChat {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: center;
+  justify-content: center;
+
+  margin: 30px 0;
+}
+
+.userListText {
+  margin: 5px 0px 7px 5px;
+  white-space: nowrap;
 }

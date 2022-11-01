@@ -13,7 +13,7 @@ export default function ChatPage() {
   return (
     <Layout>
       <UserDisplayProvider>
-        <Room />
+        <Room roomId={id} />
       </UserDisplayProvider>
     </Layout>
   );

@@ -12,7 +12,7 @@ export function StompProvider({ children }) {
 
   function init() {
     console.log('Lets try connect!');
-    let sock = new SockJS('http://210.123.251.246:28081/ws/chat');
+    let sock = new SockJS('https://code99-dev.pyuri.dev/ws/chat');
     //stomp_client = Stomp.over(sock);
     setStompClient(Stomp.over(sock));
     // stomp_client.debug = null;
