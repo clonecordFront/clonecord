@@ -12,7 +12,7 @@ export default function InvitePage({ props }) {
       <img
         className={styles.bgImg}
         src={backgroundPath}
-        alt='invite page background image'
+        alt='invite page background'
       />
 
       <div className={styles.inviteBox}>

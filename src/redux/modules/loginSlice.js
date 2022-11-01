@@ -1,6 +1,5 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import instance from '../../shared/Request';
-import axios from "axios";
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import axios from 'axios';
 
 export const __memberLogin = createAsyncThunk(
   'MEMBER_LOGIN',
@@ -11,38 +10,46 @@ export const __memberLogin = createAsyncThunk(
           'Content-Type': 'application/json',
         },
       };
-      const { data, headers} = await axios.post('http://13.124.142.195/api/members/login', payload, config);
-      sessionStorage.setItem('Authorization', headers.authorization)
-      sessionStorage.setItem('Refresh-Token', headers['refresh-token'])
-      return thunkAPI.fulfillWithValue({...data, ...headers});
-      } catch (error) {
-        alert(error.response.data.message);
+      const { data, headers } = await axios.post(
+        'https://code99-dev.pyuri.dev/api/members/login',
+        payload,
+        config
+      );
+      // sessionStorage.setItem('Authorization', headers.authorization);
+      // sessionStorage.setItem('Refresh-Token', headers['refresh-token']);
+      return thunkAPI.fulfillWithValue({ ...data, ...headers });
+    } catch (error) {
+      alert(error.response.data.message);
     }
   }
 );
 
 export const __memberLogout = createAsyncThunk(
-  "MEMBER_LOGOUT",
+  'MEMBER_LOGOUT',
   async (payload, thunkAPI) => {
     try {
       const config = {
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': sessionStorage.getItem('Authorization'),
-          'Refresh-Token': sessionStorage.getItem('Refresh-Token')
+          Authorization: sessionStorage.getItem('Authorization'),
+          'Refresh-Token': sessionStorage.getItem('Refresh-Token'),
         },
       };
-      const { data } = await axios.post("http://13.124.142.195/api/auth/members/logout", payload, config);
+      const { data } = await axios.post(
+        'https://code99-dev.pyuri.dev/api/auth/members/logout',
+        payload,
+        config
+      );
       return thunkAPI.fulfillWithValue(data);
     } catch (error) {
       return thunkAPI.rejectWithValue(error);
     }
   }
-  );
+);
 
 const initialState = {
   user: {
-    data :{},
+    data: {},
     authorization: null,
     refresh_token: null,
     isLoading: false,
@@ -60,9 +67,18 @@ export const loginSlice = createSlice({
     },
     [__memberLogin.fulfilled]: (state, action) => {
       state.user.isLoading = false;
-      state.user.data = action.payload.data;
-      state.user.authorization = action.payload.authorization;
-      state.user.refresh_token = action.payload['refresh-token'];
+      if (action.payload) {
+        state.user.data = action.payload.data;
+        state.user.authorization = action.payload.authorization;
+        state.user.refresh_token = action.payload['refresh-token'];
+
+        sessionStorage.setItem('User', JSON.stringify(action.payload.data));
+        sessionStorage.setItem('Authorization', action.payload.authorization);
+        sessionStorage.setItem(
+          'Refresh-Token',
+          action.payload['refresh-token']
+        );
+      }
     },
     [__memberLogin.rejected]: (state, action) => {
       state.user.isLoading = false;
