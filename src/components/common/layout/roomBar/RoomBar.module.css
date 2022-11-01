@@ -54,3 +54,155 @@ ul {
   background-color: yellow;
   border-radius: 30%;
 }
+
+.modalLayoutOpen {
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  width: 100vw;
+  height: 100vh;
+
+  background-color: var(--color-black);
+  opacity: 0.8;
+
+  z-index: 10;
+
+  transition: all 300ms ease-in;
+}
+.modalLayoutClose {
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  width: 100vw;
+  height: 100vh;
+
+  background-color: var(--color-black);
+  opacity: 0;
+
+  z-index: 10;
+
+  pointer-events: none;
+  transition: all 300ms ease-in;
+}
+
+.modalBoxOpen {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-20vh);
+
+  background-color: var(--color-white);
+  border-radius: 5px;
+  padding: 20px 20px;
+  opacity: 1;
+  z-index: 820;
+
+  transition: all 300ms ease-in;
+
+  width: 430px;
+}
+.modalBoxClose {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-20vh);
+
+  background-color: var(--color-white);
+  border-radius: 5px;
+  padding: 20px 20px;
+  opacity: 0;
+  z-index: 820;
+
+  pointer-events: none;
+  transition: all 300ms ease-in;
+
+  width: 430px;
+}
+
+.modalForm {
+  display: flex;
+  flex-flow: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.formText {
+  font-family: 'Noto Sans CJK KR';
+  font-style: normal;
+  color: var(--colort-black);
+  font-size: var(--font-large);
+  font-weight: bold;
+}
+.formServeText {
+  font-family: 'Noto Sans CJK KR';
+  font-style: normal;
+  color: var(--color-light-black);
+  font-size: var(--font-small);
+  font-weight: normal;
+
+  display: flex;
+  text-align: center;
+
+  margin: 10px 0px;
+}
+
+.formInput {
+  margin: 10px 0;
+  padding: 10px 20px;
+  border: none;
+  outline: none;
+  border-radius: 4px;
+  background-color: var(--color-bg);
+
+  font-family: 'Noto Sans CJK KR';
+  font-style: normal;
+  color: var(--color-light-black);
+  font-size: var(--font-regular);
+  font-weight: bold;
+
+  width: 100%;
+}
+.formInput::placeholder {
+  color: var(--color-light-white);
+  font-size: var(--font-regular);
+  font-weight: normal;
+}
+
+.submitBtn {
+  background-color: var(--color-light-blue);
+  border-radius: 4px;
+
+  height: 50px;
+  width: 100%;
+
+  font-family: 'Noto Sans CJK KR';
+  font-style: normal;
+  color: var(--color-light-white);
+  font-size: var(--font-regular);
+  font-weight: bold;
+}
+
+.xBtn {
+  width: 25px;
+  height: 25px;
+  position: absolute;
+  top: 15px;
+  right: 15px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  z-index: 850;
+  cursor: pointer;
+  font-size: 25px;
+  color: var(--color-bg);
+
+  transition: all 100ms ease-in;
+}
+
+.xBtn:hover {
+  color: var(--color-black);
+}
