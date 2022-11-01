@@ -20,6 +20,11 @@ export default function Room({ roomId }) {
   const { stompClient } = useContext(StompContext);
   const { isUserDisplay } = useContext(UserDisplayContext);
 
+  const user = JSON.parse(sessionStorage.getItem('User'));
+  const authorization = sessionStorage.getItem('Authorization');
+  const refresh_token = sessionStorage.getItem('Refresh-Token');
+  console.log(user, authorization, refresh_token);
+
   // TODO: 브라우저 화면 크기에따른 크기 조절 & 마운트 시 스크롤 아래로
   const [chatboxHeight, setChatboxHeight] = useState(
     window.innerHeight - 25 - 60 - 3 - 60
