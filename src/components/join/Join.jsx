@@ -3,7 +3,7 @@ import { useState } from 'react';
 import React from 'react';
 import styles from './Join.module.css';
 
-export default function Join({setInSignup}) {
+export default function Join({ setInSignup }) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -12,7 +12,7 @@ export default function Join({setInSignup}) {
   const register = () => {
     axios
       .post(
-        'http://13.124.142.195/api/members/signup',
+        'https://code99-dev.pyuri.dev/api/members/signup',
         {
           nickname: name,
           email: email,
@@ -26,7 +26,7 @@ export default function Join({setInSignup}) {
       .then((response) => {
         sessionStorage.setItem('token', response.data.jwt);
         alert('회원가입에 성공했습니다.');
-        setInSignup(false)
+        setInSignup(false);
       })
       .catch((error) => {
         alert(error.response.data.message);
@@ -37,7 +37,7 @@ export default function Join({setInSignup}) {
   const nickNameCheck = () => {
     axios
       .post(
-        'http://13.124.142.195/api/members/check/nick',
+        'https://code99-dev.pyuri.dev/api/members/check/nick',
         {
           nickname: name,
         },
@@ -65,7 +65,7 @@ export default function Join({setInSignup}) {
   const emailCheck = () => {
     axios
       .post(
-        'http://13.124.142.195/api/members/check/email',
+        'https://code99-dev.pyuri.dev/api/members/check/email',
         {
           email: email,
         },
@@ -94,7 +94,7 @@ export default function Join({setInSignup}) {
   const nameChekOnClickHandler = () => {
     nickNameCheck();
   };
-  
+
   const emailOnChangeHandler = (e) => {
     setEmail(e.target.value);
   };
@@ -123,7 +123,7 @@ export default function Join({setInSignup}) {
             <p className={styles.text}>이름</p>
             <input
               className={styles.input}
-              placeholder="이름을 입력하세요"
+              placeholder='이름을 입력하세요'
               type={name}
               onChange={nameOnChangeHandler}
             />
@@ -133,7 +133,7 @@ export default function Join({setInSignup}) {
             <p className={styles.text}>이메일</p>
             <input
               className={styles.input}
-              placeholder="이메일을 입력하세요"
+              placeholder='이메일을 입력하세요'
               type={email}
               onChange={emailOnChangeHandler}
             />
@@ -143,15 +143,15 @@ export default function Join({setInSignup}) {
             <p className={styles.text}>비밀번호</p>
             <input
               className={styles.passwordInput}
-              placeholder="비밀번호를 입력하세요"
-              type="password"
+              placeholder='비밀번호를 입력하세요'
+              type='password'
               onChange={passwordOnChangeHandler}
             />
             <p className={styles.text}>비밀번호 확인</p>
             <input
               className={styles.passwordInput}
-              placeholder="비밀번호 확인"
-              type="password"
+              placeholder='비밀번호 확인'
+              type='password'
               onChange={passwordCheckOnChangeHandler}
             />
           </div>
