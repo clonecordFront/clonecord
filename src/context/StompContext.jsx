@@ -42,7 +42,7 @@ export function StompProvider({ children }) {
       }
     };
   }, []);
-
+  
   useEffect(() => {
     if (stompClient) stompClient.connect({}, onConnected, onError); // First arg is Header
   }, [stompClient]);

@@ -1,0 +1,96 @@
+/* .wrapper {
+  background-color: var(--color-dark-white);
+  display: flex;
+  flex-flow: column nowrap;
+  height: 100vh;
+}
+
+.box {
+  display: flex;
+  flex-flow: row nowrap;
+  width: 100%;
+  flex: 1;
+} */
+.container {
+  background-color: var(--color-white);
+  border-top-left-radius: 10px;
+
+  font-family: 'Noto Sans CJK KR';
+  font-style: normal;
+  color: var(--color-light-black);
+  font-weight: normal;
+
+  flex: 1;
+  height: 100%;
+  overflow: hidden;
+
+  display: flex;
+  flex-flow: column nowrap;
+}
+
+.box {
+  background-color: var(--color-light-white);
+  box-shadow: 3px 3px 3px 3px var(--color-bg);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 400px;
+  height: 450px;
+  border-radius: 12px;
+}
+
+.input {
+  width: 280px;
+  height: 40px;
+  margin-left: 15px;
+  border-radius: 10px;
+  border: 0 solid black;
+  box-shadow: 1px 1px 1px 1px var(--color-bg);
+}
+.passwordInput {
+  width: 360px;
+  height: 40px;
+  margin-left: 15px;
+  border-radius: 10px;
+  border: 0 solid black;
+  box-shadow: 1px 1px 1px 1px var(--color-bg);
+}
+.text {
+  margin-top: 14px;
+  margin-left: 18px;
+  font-weight: var(--weight-semi-bold);
+}
+.joinText {
+  margin-top: 15px;
+  text-align: center;
+  padding-bottom: 10px;
+  font-weight: var(--weight-bold);
+
+  box-shadow: 0 5px 5px -5px var(--color-dark-white);
+}
+
+.cheBtn {
+  background-color: var(--color-bg);
+  width: 70px;
+  height: 40px;
+  margin-left: 10px;
+  font-size: var(--font-small);
+  border-radius: 10px;
+  font-weight: var(--weight-semi-bold);
+  box-shadow: 1px 1px 1px 1px var(--color-dark-white);
+}
+
+.joinBtn {
+  background-color: var(--color-light-blue);
+  color: var(--color-light-white);
+  width: 360px;
+  height: 50px;
+  margin-left: 15px;
+  font-size: var(--font-regular);
+  border-radius: 10px;
+  margin-top: 20px;
+  display: block;
+  font-weight: var(--weight-semi-bold);
+  box-shadow: 3px 3px 3px 3px var(--color-bg);
+}
