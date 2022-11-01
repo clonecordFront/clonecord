@@ -5,7 +5,7 @@ import { __memberLogin } from "../../redux/modules/LoginSlice";
 import styles from './LoginPage.module.css'
 import Layout from "../../components/common/layout/Layout";
 
-export default function LoginPage() {
+export default function LoginPage({setInSignup}) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -59,7 +59,7 @@ export default function LoginPage() {
           </form>
           <form>
             <div>
-              <p style={{color:'var(--color-light-black)'}} onClick={() => navigate('/')}>아직 회원이 아니신가요?</p>
+              <p style={{color:'var(--color-light-black)'}} onClick={()=>{setInSignup(true)}}>아직 회원이 아니신가요?</p>
             </div>
           </form>
         </div>

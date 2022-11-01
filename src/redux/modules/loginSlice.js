@@ -12,10 +12,9 @@ export const __memberLogin = createAsyncThunk(
         },
       };
       const { data, headers} = await axios.post('http://13.124.142.195/api/members/login', payload, config);
-      console.log(data)
       sessionStorage.setItem('Authorization', headers.authorization)
       sessionStorage.setItem('Refresh-Token', headers['refresh-token'])
-      return thunkAPI.fulfillWithValue(data);
+      return thunkAPI.fulfillWithValue({...data, ...headers});
       } catch (error) {
         alert(error.response.data.message);
     }
@@ -44,6 +43,8 @@ export const __memberLogout = createAsyncThunk(
 const initialState = {
   user: {
     data :{},
+    authorization: null,
+    refresh_token: null,
     isLoading: false,
     error: null,
   },
@@ -60,8 +61,24 @@ export const loginSlice = createSlice({
     [__memberLogin.fulfilled]: (state, action) => {
       state.user.isLoading = false;
       state.user.data = action.payload.data;
+      state.user.authorization = action.payload.authorization;
+      state.user.refresh_token = action.payload['refresh-token'];
     },
     [__memberLogin.rejected]: (state, action) => {
+      state.user.isLoading = false;
+      state.error = action.payload;
+    },
+    [__memberLogout.pending]: (state) => {
+      state.user.isLoading = true;
+    },
+    [__memberLogout.fulfilled]: (state) => {
+      sessionStorage.clear();
+      state.user.isLoading = false;
+      state.user.data = {};
+      state.user.authorization = null;
+      state.user.refresh_token = null;
+    },
+    [__memberLogout.rejected]: (state, action) => {
       state.user.isLoading = false;
       state.error = action.payload;
     },

@@ -2,7 +2,8 @@ import axios from 'axios';
 import { useState } from 'react';
 import React from 'react';
 import styles from './Join.module.css';
-export default function Join() {
+
+export default function Join({setInSignup}) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -25,6 +26,7 @@ export default function Join() {
       .then((response) => {
         sessionStorage.setItem('token', response.data.jwt);
         alert('회원가입에 성공했습니다.');
+        setInSignup(false)
       })
       .catch((error) => {
         alert(error.response.data.message);

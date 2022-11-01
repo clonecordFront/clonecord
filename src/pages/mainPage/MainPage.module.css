@@ -14,3 +14,16 @@
   display: flex;
   flex-flow: column nowrap;
 }
+
+.mainbox {
+  background-color: var(--color-light-white);
+  width: 500px;
+  height: 500px;
+  
+  left: 0;
+  right: 0;
+}
+
+.box {
+  width: 100%;
+}
