@@ -11,19 +11,30 @@
   height: 100%;
   overflow: hidden;
 
+  align-items: center;
+  justify-content: center;
   display: flex;
-  flex-flow: column nowrap;
+  text-align: center;
 }
 
 .mainbox {
-  background-color: var(--color-light-white);
-  width: 500px;
+  width:  500px;
   height: 500px;
-  
-  left: 0;
-  right: 0;
+  background-color: skyblue;
+
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  text-align: center;
 }
 
-.box {
-  width: 100%;
+.box{
+
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: center;
+  justify-content: center;
+
+  margin: 30px 0;
+  
 }
