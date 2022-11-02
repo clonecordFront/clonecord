@@ -2,20 +2,11 @@ import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom/dist';
 import { useDispatch } from 'react-redux';
 import { __memberLogin } from '../../redux/modules/LoginSlice';
-import { Darkmode } from '../../context/DarkmodeContext';
 import styles from './LoginPage.module.css';
 
-export default function LoginPage({ setInSignup}, porps) {
+export default function LoginPage({ setInSignup }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-
-  // const { isDarkmode, toggleIsDarkmode } = useContext(true);
-  
-  const [isDark, setIsDark] = useState(false);
-  const toggleDark = () => {
-    setIsDark((prev) => !prev);
-    console.log('hi')
-  }
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -45,9 +36,8 @@ export default function LoginPage({ setInSignup}, porps) {
 
   return (
     <div>
-      
-      <div className={isDark ? styles.darkloginBox : styles.lightloginBox}>
-        <button onClick={toggleDark}>다크모드</button>
+      <div className={styles.lightloginBox}>
+         {/* {isDark ? styles.lightloginBox : styles.darkloginBox}> */}
         <form onSubmit={onSubmitHandler}>
           <div>
             <i

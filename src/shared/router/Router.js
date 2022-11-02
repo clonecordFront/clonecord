@@ -16,7 +16,6 @@ const Router = () => {
         {/* <Route path='*' element={<MainPage />} /> */}
         <Route path='/join' element={<JoinPage />} />
         <Route path='/mode' element={<Mode />} />
-        
       </Routes>
     </BrowserRouter>
   );

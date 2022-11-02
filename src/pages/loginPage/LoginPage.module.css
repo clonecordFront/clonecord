@@ -3,7 +3,7 @@
   border: 1px solid #ffffff;
   width:400px;
   height:330px;
-  background-color: black;
+  background-color: var(--color-dark-white);
   margin-left:-150px;
   margin-top:-150px;
   position: absolute;
@@ -15,7 +15,7 @@
   border: 1px solid #ffffff;
   width:400px;
   height:330px;
-  background-color: var(--color-dark-white);
+  background-color: var(--color-light-black);
   margin-left:-150px;
   margin-top:-150px;
   position: absolute;

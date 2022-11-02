@@ -4,16 +4,16 @@ import Layout from '../../components/common/layout/Layout';
 import styles from './MainPage.module.css';
 import LoginPage from '../loginPage/LoginPage';
 import Join from '../../components/join/Join';
-
 import { __memberLogout } from '../../redux/modules/LoginSlice';
 import { useDispatch } from 'react-redux';
 import { indexOf } from 'lodash';
+import { DarkProvider } from '../../context/DarkmodeContext';
+
 
 export default function MainPage() {
   const dispatch = useDispatch();
 
   const loginuser = useSelector((state) => state.user.user);
-  console.log(loginuser.data, loginuser.authorization, loginuser.refresh_token);
 
   const [inSignup, setInSignup] = useState(false);
 
@@ -59,15 +59,17 @@ export default function MainPage() {
 
   return (
     <Layout>
-      <div className={styles.container}>
-        {authorization && refresh_token ? (
-          <MainForm />
-        ) : inSignup ? (
-          <SignupForm />
-        ) : (
-          <LoginForm />
-        )}
-      </div>
+      <DarkProvider>
+        <div className={styles.container}>
+          {authorization && refresh_token ? (
+            <MainForm />
+          ) : inSignup ? (
+            <SignupForm />
+          ) : (
+            <LoginForm />
+          )}
+        </div>
+      </DarkProvider>
     </Layout>
   );
 }

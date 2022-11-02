@@ -1,0 +1,26 @@
+.modeContainer {
+  border-radius: 10px;
+  border: 1px solid #ffffff;
+  width:400px;
+  height:330px;
+  position: absolute;
+}
+
+.lightloginBox {
+  border-radius: 10px;
+  border: 1px solid #ffffff;
+  width:400px;
+  height:330px;
+  background-color: var(--color-dark-white);
+  padding: 10px;
+  box-shadow: 0px 3px 8px 3px rgba(0, 0, 0, 0.3);
+}
+.darkloginBox {
+  border-radius: 10px;
+  border: 1px solid #ffffff;
+  width:400px;
+  height:330px;
+  background-color: var(--color-light-black);
+  padding: 10px;
+  box-shadow: 0px 3px 8px 3px rgba(0, 0, 0, 0.3);
+}

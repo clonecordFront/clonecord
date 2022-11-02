@@ -1,25 +1,20 @@
-import React, {useState} from 'react'
-import { useModeText } from './ModeText';
+import React, {useContext, useState} from 'react'
+import styles from './Mode.module.css'
+import { Darkmode } from '../../../context/DarkmodeContext';
 
 
 export default function Mode() {
-  const {textTheme, setTextTheme} = useModeText();
-
-  const [checked, setChecked] = useState(false);
-  const handleSwitch = (e) => {
-    setTextTheme((state) => (state === 'Light'? 'Dark':'Light'))
-    setChecked(e);
-    console.log(e);
-  }
+  const { isDark, toggleIsDark } = useContext(Darkmode)
+  
+  const toggleISDark = sessionStorage.setItem('KeepDarkmode',true)
 
   return (
-    <div className='modeHeader' id={textTheme}>
-      <div
-        onChange={handleSwitch}
-        checked={checked}
-        style={{width:'100px', height:'100px', backgroundColor:'white'}}
-      >Mode</div>
-
-    </div>
+    <>
+      <div className={styles.modeContainer}>
+        <div className={isDark ? styles.lightloginBox : styles.darkloginBox}>
+          <button onClick={toggleIsDark}>다크모드</button>
+        </div>
+      </div>
+    </>
   )
 }
