@@ -119,7 +119,7 @@ export default function Join({ setInSignup }) {
       <div className={styles.container}>
         <div className={styles.box}>
           <h3 className={styles.joinText}>회원가입</h3>
-          <div>
+          
             <p className={styles.text}>이름</p>
             <input
               className={styles.input}
@@ -154,7 +154,7 @@ export default function Join({ setInSignup }) {
               type='password'
               onChange={passwordCheckOnChangeHandler}
             />
-          </div>
+          
           <button className={styles.joinBtn} onClick={joinOnClickHandler}>
             SIGN UP
           </button>

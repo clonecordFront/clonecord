@@ -1,12 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom/dist';
 import { useDispatch } from 'react-redux';
 import { __memberLogin } from '../../redux/modules/LoginSlice';
+import { Darkmode } from '../../context/DarkmodeContext';
 import styles from './LoginPage.module.css';
 
-export default function LoginPage({ setInSignup }) {
+export default function LoginPage({ setInSignup}, porps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+
+  // const { isDarkmode, toggleIsDarkmode } = useContext(true);
+  
+  const [isDark, setIsDark] = useState(false);
+  const toggleDark = () => {
+    setIsDark((prev) => !prev);
+    console.log('hi')
+  }
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -36,14 +45,16 @@ export default function LoginPage({ setInSignup }) {
 
   return (
     <div>
-      <div className={styles.loginBox}>
+      
+      <div className={isDark ? styles.darkloginBox : styles.lightloginBox}>
+        <button onClick={toggleDark}>다크모드</button>
         <form onSubmit={onSubmitHandler}>
           <div>
             <i
               className='fa-brands fa-discord fa-3x'
               style={{ color: '#5865fe' }}
             />
-            <p>99cord</p>
+            <div className={styles.text}>99cord</div>
             <input
               className={styles.loginInput}
               value={email || ''}
@@ -63,16 +74,16 @@ export default function LoginPage({ setInSignup }) {
         </form>
         <form>
           <div>
-            <p
-              style={{ color: 'var(--color-light-black)' }}
+            <div className={styles.signUptext}
               onClick={() => {
                 setInSignup(true);
               }}
             >
               아직 회원이 아니신가요?
-            </p>
+            </div>
           </div>
         </form>
+      
       </div>
     </div>
   );

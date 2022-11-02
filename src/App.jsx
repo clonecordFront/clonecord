@@ -4,9 +4,10 @@ import { StompProvider } from './context/StompContext';
 import './App.module.css';
 
 export default function App() {
+
   return (
-    <StompProvider>
-      <Router />
-    </StompProvider>
+      <StompProvider>
+        <Router />
+      </StompProvider>
   );
 }

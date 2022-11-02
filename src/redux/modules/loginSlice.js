@@ -18,6 +18,7 @@ export const __memberLogin = createAsyncThunk(
       // sessionStorage.setItem('Authorization', headers.authorization);
       // sessionStorage.setItem('Refresh-Token', headers['refresh-token']);
       return thunkAPI.fulfillWithValue({ ...data, ...headers });
+      // navigate("/",{ replace:true})
     } catch (error) {
       alert(error.response.data.message);
     }

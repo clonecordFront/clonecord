@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import Layout from '../../components/common/layout/Layout';
 import styles from './MainPage.module.css';
@@ -7,7 +7,7 @@ import Join from '../../components/join/Join';
 
 import { __memberLogout } from '../../redux/modules/LoginSlice';
 import { useDispatch } from 'react-redux';
-
+import { indexOf } from 'lodash';
 
 export default function MainPage() {
   const dispatch = useDispatch();
@@ -15,28 +15,18 @@ export default function MainPage() {
   const loginuser = useSelector((state) => state.user.user);
   console.log(loginuser.data, loginuser.authorization, loginuser.refresh_token);
 
-
   const [inSignup, setInSignup] = useState(false);
 
   const authorization = sessionStorage.getItem('Authorization');
   const refresh_token = sessionStorage.getItem('Refresh-Token');
 
-  // 유저 닉네임 로컬에 저장
-  const inputValue = loginuser.data.nickname
-  useEffect(()=>{ 
-    if(!inputValue) {
-    } else{
-      localStorage.setItem("nickName", JSON.stringify(inputValue))
-    }
-  })
-  
+  const userName = JSON.parse(sessionStorage.getItem('User'))
+
   const onSubmitHandler = (e) => {
     e.preventDefault(e);
     dispatch(__memberLogout());
-    localStorage.clear()
   }
   
-
   const LoginForm = () => {
     return (
       <>
@@ -44,6 +34,7 @@ export default function MainPage() {
       </>
     );
   };
+
   const SignupForm = () => {
     return (
       <>
@@ -51,14 +42,16 @@ export default function MainPage() {
       </>
     );
   };
+
   const MainForm = () => {
     return (
       <div className={styles.mainbox}>
         <div className={styles.box}>
-          <p>환영합니다!</p>
-
-          <button>로그아웃 버튼 정렬,</button>
-          <button className={styles} onClick={onSubmitHandler}>로그아웃</button>
+          <h2>99cord에 오신것을 환영합니다!</h2>
+          <h3>'{userName.nickname}'의 친구들이 기다리고 있어요.</h3>
+          <div className={styles.buttonbox}>
+            <button className={styles.logoutbutton} onClick={onSubmitHandler}>로그아웃</button>
+          </div>
         </div>
       </div>
     );
@@ -70,7 +63,7 @@ export default function MainPage() {
         {authorization && refresh_token ? (
           <MainForm />
         ) : inSignup ? (
-          <SignuoForm />
+          <SignupForm />
         ) : (
           <LoginForm />
         )}
