@@ -80,6 +80,7 @@ export const loginSlice = createSlice({
           action.payload['refresh-token']
         );
       }
+      window.location.reload();
     },
     [__memberLogin.rejected]: (state, action) => {
       state.user.isLoading = false;
@@ -94,6 +95,7 @@ export const loginSlice = createSlice({
       state.user.data = {};
       state.user.authorization = null;
       state.user.refresh_token = null;
+      window.location.reload();
     },
     [__memberLogout.rejected]: (state, action) => {
       state.user.isLoading = false;

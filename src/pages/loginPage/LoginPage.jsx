@@ -8,7 +8,6 @@ export default function LoginPage({ setInSignup }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const onChangeEmail = (e) => {
@@ -31,7 +30,7 @@ export default function LoginPage({ setInSignup }) {
     );
     setEmail('');
     setPassword('');
-    navigate('/');
+    //navigate('/');
   };
 
   return (
