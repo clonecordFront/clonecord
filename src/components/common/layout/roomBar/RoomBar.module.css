@@ -10,7 +10,7 @@
 
 .Logo {
   cursor: pointer;
-  margin-top: 5px;
+  margin-top: 10px;
   background-color: var(--color-white);
   border-radius: 50%;
   width: 50px;
@@ -22,6 +22,13 @@
 
   transition: all 200ms ease-in;
   font-size: var(--font-medium);
+  overflow: hidden;
+}
+
+.channelLogo {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
 }
 
 .main:hover {
@@ -51,8 +58,8 @@ ul {
 }
 
 .temp:hover {
-  background-color: yellow;
   border-radius: 30%;
+  overflow: hidden;
 }
 
 .modalLayoutOpen {
@@ -89,7 +96,7 @@ ul {
 
 .modalBoxOpen {
   position: absolute;
-  top: 50%;
+  top: 30%;
   left: 50%;
   transform: translateX(-50%) translateY(-20vh);
 
@@ -105,7 +112,7 @@ ul {
 }
 .modalBoxClose {
   position: absolute;
-  top: 50%;
+  top: 30%;
   left: 50%;
   transform: translateX(-50%) translateY(-20vh);
 
@@ -205,4 +212,37 @@ ul {
 
 .xBtn:hover {
   color: var(--color-black);
+}
+
+.preImgBox {
+  position: relative;
+  background-color: transparent;
+  width: 200px;
+  height: 200px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+
+  border-radius: 50%;
+  border: 6px solid black;
+  margin: 20px 0;
+}
+
+.preImg {
+  width: 200px;
+  height: 200px;
+  object-fit: cover;
+}
+
+.preLab {
+  position: absolute;
+  color: var(--color-light-black);
+  cursor: pointer;
+
+  font-family: 'Noto Sans CJK KR';
+  font-style: normal;
+  font-size: var(--font-regular);
+  font-weight: bold;
 }

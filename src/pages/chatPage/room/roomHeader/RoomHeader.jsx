@@ -2,7 +2,7 @@ import React, { useContext, useState } from 'react';
 import { UserDisplayContext } from '../../../../context/UserDisplayContext';
 import styles from './RoomHeader.module.css';
 
-export default function RoomHeader(props) {
+export default function RoomHeader({ channel }) {
   const [dropOpen, setDropOpen] = useState(false);
   const { isUserDisplay, toggleIsUserDisplay } = useContext(UserDisplayContext);
 
@@ -13,7 +13,7 @@ export default function RoomHeader(props) {
   return (
     <div className={styles.box}>
       <div className={styles.name} onClick={toggleDrop}>
-        <span>채널명예정</span>
+        <span>{channel.roomName}</span>
         <div
           className={styles.nameBtn}
           style={{

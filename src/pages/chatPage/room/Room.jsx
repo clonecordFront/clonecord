@@ -6,24 +6,25 @@ import { useDispatch, useSelector } from 'react-redux';
 import useInput from '../../../hooks/useInput';
 import { UserDisplayContext } from '../../../context/UserDisplayContext';
 import { StompContext } from '../../../context/StompContext';
+import { TabContext } from '../../../context/TabContext ';
 
 import Chat from '../chat/Chat';
 import styles from './Room.module.css';
 import RoomHeader from './roomHeader/RoomHeader';
 
-import { ADD_CHAT } from '../../../redux/modules/ChatSlice';
+import { ADD_CHAT, __getChannel } from '../../../redux/modules/ChatSlice';
 
 import placeholderPath from '../../../img/profile_placeholder.png';
 import User from '../user/User';
 
 export default function Room({ roomId }) {
   const { stompClient } = useContext(StompContext);
+  const { setTab } = useContext(TabContext);
   const { isUserDisplay } = useContext(UserDisplayContext);
 
   const user = JSON.parse(sessionStorage.getItem('User'));
   const authorization = sessionStorage.getItem('Authorization');
   const refresh_token = sessionStorage.getItem('Refresh-Token');
-  console.log(user, authorization, refresh_token);
 
   // TODO: 브라우저 화면 크기에따른 크기 조절 & 마운트 시 스크롤 아래로
   const [chatboxHeight, setChatboxHeight] = useState(
@@ -40,11 +41,12 @@ export default function Room({ roomId }) {
 
   const scrollUL = () => {
     let chatUL = document.querySelector('#chatUL');
-    chatUL.scrollTo(0, chatUL.scrollHeight);
+    if (chatUL) chatUL.scrollTo(0, chatUL.scrollHeight);
   };
 
   useEffect(() => {
-    prepareScroll();
+    setTab(roomId);
+    window.setTimeout(scrollUL, 300);
     window.addEventListener('resize', handleResize);
     return () => {
       window.removeEventListener('resize', handleResize);
@@ -62,11 +64,14 @@ export default function Room({ roomId }) {
 
     stompClient.send(
       '/app/chat/message',
-      {},
+      {
+        Authorization: authorization,
+        'Refresh-token': refresh_token,
+      },
       JSON.stringify({
         type: 'TALK',
-        roomId: '1',
-        sender: 'test',
+        roomId: roomId,
+        sender: user.nickname,
         message: chatInput,
       })
     );
@@ -78,20 +83,18 @@ export default function Room({ roomId }) {
   const onMessageReceived = (payload) => {
     console.log('Received!');
     const payloadData = JSON.parse(payload.body);
-    console.log(payload);
-    switch (payloadData.type) {
-      case 'TALK':
-        dispatch(ADD_CHAT(payloadData));
-        prepareScroll();
-        break;
-      default:
-        break;
+    console.log(payloadData.room.roomId, parseInt(roomId));
+    if (payloadData.room.roomId === parseInt(roomId)) {
+      switch (payloadData.type) {
+        case 'TALK':
+          dispatch(ADD_CHAT({ ...payloadData, roomId: roomId }));
+          prepareScroll();
+          break;
+        default:
+          break;
+      }
     }
   };
-
-  useEffect(() => {
-    console.log(chats.data);
-  }, [chats.data]);
 
   //! Mount시 구독 && Dismount시 구독 해지
   useEffect(() => {
@@ -100,7 +103,11 @@ export default function Room({ roomId }) {
       if (stompClient !== undefined) {
         if (stompClient.connected) {
           console.log('Stomp is connected now. Lets subscribe!');
-          stompClient.subscribe(`/topic/chat/room/1`, onMessageReceived, {}); //? second: callback after subscribe, third: headers
+          stompClient.subscribe(
+            `/topic/chat/room/${roomId}`,
+            onMessageReceived,
+            { id: `sub-${roomId}` }
+          ); //? second: callback after subscribe, third: headers
         } else {
           console.log('Stomp not connected yet...');
         }
@@ -110,19 +117,38 @@ export default function Room({ roomId }) {
     }, 200);
 
     return () => {
-      if (stompClient !== undefined && stompClient !== null) {
-        stompClient
-          .subscribe(`/topic/chat/room/1`, onMessageReceived, {})
-          .unsubscribe();
+      if (
+        stompClient !== undefined &&
+        stompClient !== null &&
+        stompClient.connected
+      ) {
+        stompClient.unsubscribe(`sub-${roomId}`);
         console.log('DONE...!!!');
       }
     };
-  }, [stompClient]);
+  }, [stompClient, roomId]);
+
+  //! channel 입장 시 채널 데이터 가져오기
+  const channel = useSelector((state) => state.chat.channel);
+  useEffect(() => {
+    if (authorization && refresh_token) {
+      console.log('lets dispatch');
+      dispatch(
+        __getChannel({
+          authorization: authorization,
+          refresh_Token: refresh_token,
+          roomId: roomId,
+        })
+      );
+    }
+  }, [roomId]);
+
+  //console.log(channel);
 
   return (
     <section className={styles.container}>
       {/* Channel name & Search box, Hr */}
-      <RoomHeader />
+      <RoomHeader channel={channel.data} />
       <hr className={styles.line} />
 
       <div className={styles.channelBox}>
@@ -133,11 +159,11 @@ export default function Room({ roomId }) {
               <div className={styles.imgBox}>
                 <img
                   className={styles.profile_img}
-                  src={placeholderPath}
+                  src={user.profilePic ? user.profilePic : placeholderPath}
                   alt='profile_picture'
                 />
               </div>
-              <p>FrontMan</p>
+              <p>{user.nickname}</p>
             </div>
             <div className={styles.profileBtnSet}>
               <i className='fa-solid fa-microphone'></i>
@@ -154,16 +180,16 @@ export default function Room({ roomId }) {
             style={{ maxHeight: chatboxHeight }}
           >
             <div className={styles.firstChat}>
-              <h2>채널명에</h2>
+              <h2>{channel.data.roomName} 채널에</h2>
               <h2>오신 것을 환영합니다</h2>
               <p>이 채널이 시작된 곳이에요.</p>
             </div>
 
             {/* 특정 채털의 chat list mapping */}
             {/* <Chat /> */}
-            {chats.data[1] &&
-              chats.data[1].map((chat, index) => (
-                <Chat key={index} chat={chat} />
+            {chats.data[roomId] &&
+              chats.data[roomId].map((chat) => (
+                <Chat key={chat.id} chat={chat} />
               ))}
           </ul>
 
@@ -191,21 +217,16 @@ export default function Room({ roomId }) {
           className={styles.user}
           style={{ width: isUserDisplay ? '170px' : '0px' }}
         >
-          <span className={styles.userListText}>온라인 - 4</span>
+          <span className={styles.userListText}>온라인 - 0</span>
           <ul>
-            <User />
-            <User />
-            <User />
-            <User />
+            {channel.data.memberList &&
+              channel.data.memberList.map((user) => {
+                return <User key={user.memberId} user={user} />;
+              })}
           </ul>
 
-          <span className={styles.userListText}>오프라인 - 4</span>
-          <ul>
-            <User />
-            <User />
-            <User />
-            <User />
-          </ul>
+          <span className={styles.userListText}>오프라인 - 0</span>
+          <ul>{/* <User /> */}</ul>
         </div>
       </div>
     </section>
