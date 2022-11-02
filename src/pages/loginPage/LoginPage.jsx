@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom/dist';
 import { useDispatch } from 'react-redux';
 import { __memberLogin } from '../../redux/modules/LoginSlice';
 import styles from './LoginPage.module.css';
@@ -8,7 +7,6 @@ export default function LoginPage({ setInSignup }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const onChangeEmail = (e) => {
@@ -31,7 +29,7 @@ export default function LoginPage({ setInSignup }) {
     );
     setEmail('');
     setPassword('');
-    navigate('/');
+    //navigate('/');
   };
 
   return (
