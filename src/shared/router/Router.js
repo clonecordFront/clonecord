@@ -1,8 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-
 import PrivateRoute from './PrivateRoute';
-
 import MainPage from '../../pages/mainPage/MainPage';
 import ChatPage from '../../pages/chatPage/ChatPage';
 import InvitePage from '../../pages/invitePage/InvitePage';
@@ -20,7 +18,7 @@ const Router = () => {
         </Route>
 
         {/* <Route path='*' element={<MainPage />} /> */}
-        <Route path='/join' element={<JoinPage />} />
+        {/* <Route path='/join' element={<JoinPage />} /> */}
         <Route path='/mode' element={<Mode />} />
       </Routes>
     </BrowserRouter>
