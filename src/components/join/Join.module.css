@@ -1,43 +1,23 @@
-/* .wrapper {
-  background-color: var(--color-dark-white);
-  display: flex;
-  flex-flow: column nowrap;
-  height: 100vh;
-}
-
-.box {
-  display: flex;
-  flex-flow: row nowrap;
-  width: 100%;
-  flex: 1;
-} */
 .container {
+  height: 100vh;
   background-color: var(--color-white);
-  border-top-left-radius: 10px;
-
-  font-family: 'Noto Sans CJK KR';
-  font-style: normal;
-  color: var(--color-light-black);
-  font-weight: normal;
-
-  flex: 1;
-  height: 100%;
-  overflow: hidden;
-
+  align-items: center;
+  justify-content: center;
   display: flex;
-  flex-flow: column nowrap;
 }
 
 .box {
-  background-color: var(--color-light-white);
-  box-shadow: 3px 3px 3px 3px var(--color-bg);
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 400px;
-  height: 450px;
-  border-radius: 12px;
+  border-radius: 10px;
+  border: 1px solid #ffffff;
+  width:400px;
+  height:550px;
+  background-color: var(--color-bg);
+  align-items: center;
+  justify-content: center;
+  display: table-row;
+
+  padding: 10px;
+  box-shadow: 0px 3px 8px 3px rgba(0, 0, 0, 0.3);
 }
 
 .input {
@@ -57,14 +37,16 @@
   box-shadow: 1px 1px 1px 1px var(--color-bg);
 }
 .text {
+  text-align: left;
   margin-top: 14px;
   margin-left: 18px;
+  padding-left: 10px;
   font-weight: var(--weight-semi-bold);
 }
 .joinText {
   margin-top: 15px;
-  text-align: center;
   padding-bottom: 10px;
+  text-align: center;
   font-weight: var(--weight-bold);
 
   box-shadow: 0 5px 5px -5px var(--color-dark-white);
@@ -72,13 +54,13 @@
 
 .cheBtn {
   background-color: var(--color-bg);
-  width: 70px;
-  height: 40px;
+  width: max-content;
+  height: 34px;
   margin-left: 10px;
-  font-size: var(--font-small);
+  font-size: var(--font-micro);
   border-radius: 10px;
   font-weight: var(--weight-semi-bold);
-  box-shadow: 1px 1px 1px 1px var(--color-dark-white);
+  box-shadow: 0 1px 1px 1px var(--color-dark-white);
 }
 
 .joinBtn {
@@ -89,7 +71,7 @@
   margin-left: 15px;
   font-size: var(--font-regular);
   border-radius: 10px;
-  margin-top: 20px;
+  margin-top: 30px;
   display: block;
   font-weight: var(--weight-semi-bold);
   box-shadow: 3px 3px 3px 3px var(--color-bg);
