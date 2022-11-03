@@ -51,6 +51,22 @@ export const __getChannel = createAsyncThunk(
   }
 );
 
+//TODO: 토큰과 roomId를 넘겨주고 채널 가입하기
+export const __inviteChannel = createAsyncThunk(
+  'INVITE_CHANNEL',
+  async (arg, thunkAPI) => {
+    try {
+      instance.defaults.headers.post['Authorization'] = arg.authorization;
+      instance.defaults.headers.post['Refresh-token'] = arg.refresh_token;
+      const { data } = await instance.post(`/api/invite/${arg.roomId}`);
+      console.log(data);
+      return thunkAPI.fulfillWithValue(data);
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.code);
+    }
+  }
+);
+
 const initialState = {
   //? 현재 로그인 된 유저의 가입 된 채널 목록
   channels: {
@@ -76,6 +92,13 @@ export const chatSlice = createSlice({
   name: 'chat',
   initialState,
   reducers: {
+    CLEAR_CHANNEL: (state) => {
+      state.channel = {
+        data: {},
+        isLoading: false,
+        error: null,
+      };
+    },
     CLEAR_CHATS: (state) => {
       state.chats = {
         data: {},
@@ -135,5 +158,5 @@ export const chatSlice = createSlice({
   },
 });
 
-export const { CLEAR_CHATS, ADD_CHAT } = chatSlice.actions;
+export const { CLEAR_CHANNEL, CLEAR_CHATS, ADD_CHAT } = chatSlice.actions;
 export default chatSlice.reducer;

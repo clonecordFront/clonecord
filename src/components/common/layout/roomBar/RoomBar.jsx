@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useContext, useEffect } from 'react';
 import styles from './RoomBar.module.css';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import useInput from '../../../../hooks/useInput';
 import { __getChannels } from '../../../../redux/modules/ChatSlice';
+import { TabContext } from '../../../../context/TabContext ';
 
 export default function RoomBar() {
   const dispatch = useDispatch();
@@ -44,21 +45,25 @@ export default function RoomBar() {
   const saveFileImage = (file) => {
     if (file) setFileImage(URL.createObjectURL(file));
   };
-  const deleteFileImage = () => {
-    URL.revokeObjectURL(fileImage);
-    setFileImage('');
-  };
+  // const deleteFileImage = () => {
+  //   URL.revokeObjectURL(fileImage);
+  //   setFileImage('');
+  // };
   const onImageChangeHandler = (e) => {
     saveFileImage(e.target.files[0]);
   };
 
   //console.log(fileImage);
+  const { tab, setTab } = useContext(TabContext);
+
   return (
     <>
       <section className={styles.roomList}>
         <div
-          className={`${styles.Logo} ${styles.main}`}
+          className={`${styles.Logo} ${styles.main} ${tab === 'main' &&
+            styles.mainActive}`}
           onClick={() => {
+            setTab('main');
             navigate('/');
           }}
         >
@@ -72,8 +77,10 @@ export default function RoomBar() {
             channels.data.map((channel) => (
               <li key={channel.roomId}>
                 <div
-                  className={`${styles.Logo} ${styles.temp}`}
+                  className={`${styles.Logo} ${styles.temp} ${tab ===
+                    channel.roomId && styles.active}`}
                   onClick={() => {
+                    setTab(channel.roomId);
                     navigate(`/channel/${channel.roomId}`);
                   }}
                 >

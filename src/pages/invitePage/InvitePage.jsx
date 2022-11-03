@@ -1,13 +1,14 @@
 import React, { useEffect } from 'react';
 import styles from './InvitePage.module.css';
 import backgroundPath from '../../img/background.jpg';
-import { useParams } from 'react-router-dom';
-import { __getChannel } from '../../redux/modules/ChatSlice';
+import { useNavigate, useParams } from 'react-router-dom';
+import { __getChannel, __inviteChannel } from '../../redux/modules/ChatSlice';
 import { useDispatch, useSelector } from 'react-redux';
 
 export default function InvitePage() {
   const { id } = useParams();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const authorization = sessionStorage.getItem('Authorization');
   const refresh_token = sessionStorage.getItem('Refresh-Token');
 
@@ -27,6 +28,17 @@ export default function InvitePage() {
 
   console.log(channel);
 
+  const onClickHandler = () => {
+    dispatch(
+      __inviteChannel({
+        authorization: authorization,
+        refresh_token: refresh_token,
+        roomId: id,
+      })
+    );
+    navigate(`/channel/${id}`);
+  };
+
   return (
     <div className={styles.bgBox}>
       <img
@@ -44,7 +56,9 @@ export default function InvitePage() {
           />
         </div>
         <h1>{channel.data.roomName}</h1>
-        <button className={styles.inviteBtn}>초대 수락</button>
+        <button className={styles.inviteBtn} onClick={onClickHandler}>
+          초대 수락
+        </button>
       </div>
     </div>
   );

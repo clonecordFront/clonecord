@@ -133,15 +133,15 @@
 }
 
 .imgBox {
-  width: 30px;
-  height: 30px;
+  width: 35px;
+  height: 35px;
   border-radius: 50%;
   overflow: hidden;
   margin-right: 5px;
 }
 .profile_img {
-  width: 30px;
-  height: 30px;
+  width: 35px;
+  height: 35px;
 }
 
 .profileBtnSet {
@@ -164,4 +164,11 @@
 .userListText {
   margin: 5px 0px 7px 5px;
   white-space: nowrap;
+}
+
+.fullName {
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: center;
+  /* align-items: flow-start; */
 }
