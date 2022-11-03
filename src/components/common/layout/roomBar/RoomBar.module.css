@@ -31,6 +31,15 @@
   object-fit: cover;
 }
 
+.mainActive {
+  background-color: var(--color-light-blue);
+  color: var(--color-white);
+  border-radius: 30%;
+}
+.active {
+  border-radius: 30%;
+}
+
 .main:hover {
   background-color: var(--color-light-blue);
   color: var(--color-white);

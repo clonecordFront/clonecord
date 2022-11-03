@@ -12,15 +12,20 @@ import Chat from '../chat/Chat';
 import styles from './Room.module.css';
 import RoomHeader from './roomHeader/RoomHeader';
 
-import { ADD_CHAT, __getChannel } from '../../../redux/modules/ChatSlice';
+import {
+  CLEAR_CHANNEL,
+  ADD_CHAT,
+  __getChannel,
+} from '../../../redux/modules/ChatSlice';
 
 import placeholderPath from '../../../img/profile_placeholder.png';
 import User from '../user/User';
+import { useNavigate } from 'react-router-dom';
 
 export default function Room({ roomId }) {
   const { stompClient } = useContext(StompContext);
-  const { setTab } = useContext(TabContext);
   const { isUserDisplay } = useContext(UserDisplayContext);
+  const { tab, setTab } = useContext(TabContext);
 
   const user = JSON.parse(sessionStorage.getItem('User'));
   const authorization = sessionStorage.getItem('Authorization');
@@ -46,7 +51,6 @@ export default function Room({ roomId }) {
 
   useEffect(() => {
     setTab(roomId);
-    window.setTimeout(scrollUL, 300);
     window.addEventListener('resize', handleResize);
     return () => {
       window.removeEventListener('resize', handleResize);
@@ -102,7 +106,6 @@ export default function Room({ roomId }) {
     window.setTimeout(() => {
       if (stompClient !== undefined) {
         if (stompClient.connected) {
-          console.log('Stomp is connected now. Lets subscribe!');
           stompClient.subscribe(
             `/topic/chat/room/${roomId}`,
             onMessageReceived,
@@ -123,12 +126,27 @@ export default function Room({ roomId }) {
         stompClient.connected
       ) {
         stompClient.unsubscribe(`sub-${roomId}`);
-        console.log('DONE...!!!');
       }
     };
   }, [stompClient, roomId]);
 
-  //! channel 입장 시 채널 데이터 가져오기
+  //* 권한 없는 유저 쫓아내기
+  const navigate = useNavigate();
+  const getOut = () => {
+    window.setTimeout(() => {
+      if (
+        channel.data.memberList &&
+        channel.data.memberList.findIndex(
+          (member) => member.memberId === user.id
+        ) !== -1
+      ) {
+        //console.log('welcome my friend!');
+      } else if (channel.data.memberList) {
+        navigate('/');
+      }
+    }, 500);
+  };
+  //! channel 입장 시 채널 데이터 가져오기 && 퇴장시 리덕스 채널 정보 삭제
   const channel = useSelector((state) => state.chat.channel);
   useEffect(() => {
     if (authorization && refresh_token) {
@@ -141,9 +159,14 @@ export default function Room({ roomId }) {
         })
       );
     }
+
+    return () => {
+      dispatch(CLEAR_CHANNEL());
+    };
   }, [roomId]);
 
-  //console.log(channel);
+  getOut();
+  window.setTimeout(scrollUL, 200);
 
   return (
     <section className={styles.container}>
@@ -163,7 +186,23 @@ export default function Room({ roomId }) {
                   alt='profile_picture'
                 />
               </div>
-              <p>{user.nickname}</p>
+              <div className={styles.fullName}>
+                <span
+                  style={{
+                    fontSize: '20px',
+                  }}
+                >
+                  {user.nickname}
+                </span>
+                <span
+                  style={{
+                    fontSize: '13px',
+                    color: 'var(--color-light-black)',
+                  }}
+                >
+                  {user.hashtag}
+                </span>
+              </div>
             </div>
             <div className={styles.profileBtnSet}>
               <i className='fa-solid fa-microphone'></i>
