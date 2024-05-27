@@ -1,17 +1,13 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import instance from '../../shared/Request';
 
-//TODO: 토큰과 채널정보 {description, imageUrl, roomName} 넘겨주고 채널 생성하기
+//TODO: 채널 생성하기
 export const __createChannel = createAsyncThunk(
   'CREATE_CHANNEL',
   async (arg, thunkAPI) => {
     try {
-      instance.defaults.headers.post['Authorization'] = arg.authorization;
-      instance.defaults.headers.post['Refresh-token'] = arg.refresh_token;
-      const { data } = await instance.post(`/api/room`, {
-        description: arg.description,
-        imageUrl: arg.imageUrl,
-        roomName: arg.roomName,
+      const { data } = await instance.post(`/api/v1/room`, {
+        name: arg,
       });
       return thunkAPI.fulfillWithValue(data);
     } catch (error) {
@@ -20,14 +16,40 @@ export const __createChannel = createAsyncThunk(
   }
 );
 
-//TODO: 토큰을 넘겨주고 해당 유저가 가입된 채널 목록 받아오기
+//TODO: 채널 수정하기
+export const __updateChannel = createAsyncThunk(
+  'UPDATE_CHANNEL',
+  async (arg, thunkAPI) => {
+    try {
+      const { data } = await instance.put(`/api/v1/room/${arg.id}`, {
+        name: arg.name,
+      });
+      return thunkAPI.fulfillWithValue(data);
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.code);
+    }
+  }
+);
+
+//TODO: 채널 삭제하기
+export const __deleteChannel = createAsyncThunk(
+  'DELETE_CHANNEL',
+  async (arg, thunkAPI) => {
+    try {
+      const { data } = await instance.delete(`/api/v1/room/${arg}`);
+      return thunkAPI.fulfillWithValue(data);
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.code);
+    }
+  }
+);
+
+//TODO: 채널 목록 받아오기
 export const __getChannels = createAsyncThunk(
   'GET_CHANNELS',
   async (arg, thunkAPI) => {
     try {
-      instance.defaults.headers.get['Authorization'] = arg.authorization;
-      instance.defaults.headers.get['Refresh-token'] = arg.refresh_token;
-      const { data } = await instance.get(`/api/room`);
+      const { data } = await instance.get(`/api/v1/room`);
       //console.log(data);
       return thunkAPI.fulfillWithValue(data);
     } catch (error) {
@@ -36,14 +58,12 @@ export const __getChannels = createAsyncThunk(
   }
 );
 
-//TODO: 토큰과  roomId를 넘겨주고 특정 채널 정보 받아오기
+//TODO: roomId를 넘겨주고 특정 채널 정보 받아오기
 export const __getChannel = createAsyncThunk(
   'GET_CHANNEL',
   async (arg, thunkAPI) => {
     try {
-      instance.defaults.headers.get['Authorization'] = arg.authorization;
-      instance.defaults.headers.get['Refresh-token'] = arg.refresh_token;
-      const { data } = await instance.get(`/api/room/${arg.roomId}`);
+      const { data } = await instance.get(`/api/v1/room/${arg}`);
       return thunkAPI.fulfillWithValue(data);
     } catch (error) {
       return thunkAPI.rejectWithValue(error.code);
@@ -82,7 +102,7 @@ const initialState = {
   },
   //! chats. data객체의 key:channel Id, value: 해당 채널 채팅기록 배열
   chats: {
-    data: {},
+    data: [],
     isLoading: false,
     error: null,
   },
@@ -92,6 +112,13 @@ export const chatSlice = createSlice({
   name: 'chat',
   initialState,
   reducers: {
+    CLEAR_CHANNELS: (state) => {
+      state.channels = {
+        data: [],
+        isLoading: false,
+        error: null,
+      };
+    },
     CLEAR_CHANNEL: (state) => {
       state.channel = {
         data: {},
@@ -101,40 +128,74 @@ export const chatSlice = createSlice({
     },
     CLEAR_CHATS: (state) => {
       state.chats = {
-        data: {},
+        data: [],
         isLoading: false,
         error: null,
       };
     },
     ADD_CHAT: (state, action) => {
-      //console.log(action.payload.roomId, action.payload);
-      if (state.chats.data[action.payload.roomId]) {
-        state.chats.data[action.payload.roomId] = [
-          ...state.chats.data[action.payload.roomId],
-          action.payload,
-        ];
+      if (state.chats.data) {
+        state.chats.data = [...state.chats.data, action.payload];
       } else {
-        //console.log('Empty! Insert first chat');
-        state.chats.data[action.payload.roomId] = [action.payload];
+        state.chats.data = [action.payload];
       }
-      //console.log(state.chats.data[action.payload.roomId]);
-      // console.log(
-      //   state.chats.data[action.payload.roomId][
-      //     state.chats.data[action.payload.roomId].length - 2
-      //   ],
-      //   state.chats.data[action.payload.roomId][
-      //     state.chats.data[action.payload.roomId].length - 1
-      //   ]
-      // );
     },
   },
   extraReducers: {
-    /* 유저 가입된 채널 목록 받기 */
+    /* 채널 생성 */
+    [__createChannel.pending]: (state) => {
+      state.channels.isLoading = true;
+    },
+    [__createChannel.fulfilled]: (state, action) => {
+      state.channels.data.push(action.payload);
+      state.channels.isLoading = false;
+    },
+    [__createChannel.rejected]: (state, action) => {
+      state.channels.isLoading = false;
+      state.channels.error = action.payload;
+    },
+    /* 채널 수정 */
+    [__updateChannel.pending]: (state) => {
+      state.channels.isLoading = true;
+    },
+    [__updateChannel.fulfilled]: (state, action) => {
+      const index = state.channels.data.findIndex(
+        (channel) => channel.id === action.payload.id
+      );
+      if (index !== -1) {
+        // 채널 정보 업데이트 (불변성 유지)
+        state.channels.data[index] = {
+          ...state.channels.data[index],
+          name: action.payload.name,
+        };
+      }
+      state.channel.data.name = action.payload.name;
+      state.channels.isLoading = false;
+    },
+    [__updateChannel.rejected]: (state, action) => {
+      state.channels.isLoading = false;
+      state.channels.error = action.payload;
+    },
+    /* 채널 삭제 */
+    [__deleteChannel.pending]: (state) => {
+      state.channels.isLoading = true;
+    },
+    [__deleteChannel.fulfilled]: (state, action) => {
+      state.channels.data = state.channels.data.filter(
+        (channel) => channel.id !== action.payload.id
+      );
+      state.channels.isLoading = false;
+    },
+    [__deleteChannel.rejected]: (state, action) => {
+      state.channels.isLoading = false;
+      state.channels.error = action.payload;
+    },
+    /* 채널 목록 받기 */
     [__getChannels.pending]: (state) => {
       state.channels.isLoading = true;
     },
     [__getChannels.fulfilled]: (state, action) => {
-      state.channels.data = action.payload.data;
+      state.channels.data = action.payload;
       state.channels.isLoading = false;
     },
     [__getChannels.rejected]: (state, action) => {
@@ -146,9 +207,8 @@ export const chatSlice = createSlice({
       state.channel.isLoading = true;
     },
     [__getChannel.fulfilled]: (state, action) => {
-      state.channel.data = action.payload.data;
-      state.chats.data[action.payload.data.roomId] =
-        action.payload.data.chatMessageList;
+      state.channel.data = { id: action.payload.id, name: action.payload.name };
+      state.chats.data = action.payload.chats;
       state.channel.isLoading = false;
     },
     [__getChannel.rejected]: (state, action) => {
@@ -158,5 +218,6 @@ export const chatSlice = createSlice({
   },
 });
 
-export const { CLEAR_CHANNEL, CLEAR_CHATS, ADD_CHAT } = chatSlice.actions;
+export const { CLEAR_CHANNELS, CLEAR_CHANNEL, CLEAR_CHATS, ADD_CHAT } =
+  chatSlice.actions;
 export default chatSlice.reducer;

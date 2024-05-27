@@ -11,13 +11,7 @@ export default function Chat({ chat }) {
           <div className={styles.imgBox}>
             <img
               className={styles.profile_img}
-              src={
-                chat.member
-                  ? chat.member.profilePic
-                    ? chat.member.profilePic
-                    : placeholderPath
-                  : placeholderPath
-              }
+              src={placeholderPath}
               alt='profile_picture'
             />
           </div>
@@ -25,11 +19,13 @@ export default function Chat({ chat }) {
 
         <div className={styles.right}>
           <div className={styles.info}>
-            <span className={styles.nickname}>
-              {chat.member && chat.member.nickname}
-            </span>
+            <span className={styles.nickname}>{chat && chat.name}</span>
             <span className={styles.date}>
-              {chat.modifiedAt && chat.modifiedAt.slice(0, 10)}
+              {chat.timestamp &&
+                `${chat.timestamp.slice(0, 10)}　${chat.timestamp.slice(
+                  11,
+                  19
+                )}`}
             </span>
           </div>
           <div className={styles.content}>{chat.message}</div>

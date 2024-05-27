@@ -11,20 +11,16 @@ export function StompProvider({ children }) {
   //let stomp_client;
 
   function init() {
-    console.log('Lets try connect!');
-    let sock = new SockJS('https://code99-dev.pyuri.dev/ws/chat');
-    //stomp_client = Stomp.over(sock);
+    //console.log('Lets try connect!');
+    let sock = new SockJS('http://158.179.171.152/signal');
     setStompClient(Stomp.over(sock));
-    // stomp_client.debug = null;
-    //stomp_client.connect({}, onConnected, onError); // First arg is Header
-    //stompClient.connect({}, onConnected, onError); // First arg is Header
   }
 
   const onConnected = () => {
     // !userSlice 유저정보 connected true로 변경
     // !해당 유저가 참가해있는 사설채팅방 모두 다시 구독 시작
     // !Join 메시지? 선택사항
-    console.log('Just Connected!');
+    //console.log('Just Connected!');
   };
   const onError = (err) => {
     console.log('Error Occured Below');
@@ -42,7 +38,7 @@ export function StompProvider({ children }) {
       }
     };
   }, []);
-  
+
   useEffect(() => {
     if (stompClient) stompClient.connect({}, onConnected, onError); // First arg is Header
   }, [stompClient]);

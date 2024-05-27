@@ -27,9 +27,8 @@ export default function Room({ roomId }) {
   const { isUserDisplay } = useContext(UserDisplayContext);
   const { tab, setTab } = useContext(TabContext);
 
-  const user = JSON.parse(sessionStorage.getItem('User'));
-  const authorization = sessionStorage.getItem('Authorization');
-  const refresh_token = sessionStorage.getItem('Refresh-Token');
+  const nickname = JSON.parse(sessionStorage.getItem('UserNickname'));
+  const key = JSON.parse(sessionStorage.getItem('UserKey'));
 
   // TODO: 브라우저 화면 크기에따른 크기 조절 & 마운트 시 스크롤 아래로
   const [chatboxHeight, setChatboxHeight] = useState(
@@ -50,6 +49,7 @@ export default function Room({ roomId }) {
   };
 
   useEffect(() => {
+    //console.log(roomId);
     setTab(roomId);
     window.addEventListener('resize', handleResize);
     return () => {
@@ -67,15 +67,11 @@ export default function Room({ roomId }) {
     if (chatInput === '') return;
 
     stompClient.send(
-      '/app/chat/message',
-      {
-        Authorization: authorization,
-        'Refresh-token': refresh_token,
-      },
+      `/app/room/${roomId}/chat`,
+      {},
       JSON.stringify({
-        type: 'TALK',
-        roomId: roomId,
-        sender: user.nickname,
+        userId: key,
+        name: nickname,
         message: chatInput,
       })
     );
@@ -87,17 +83,19 @@ export default function Room({ roomId }) {
   const onMessageReceived = (payload) => {
     console.log('Received!');
     const payloadData = JSON.parse(payload.body);
-    console.log(payloadData.room.roomId, parseInt(roomId));
-    if (payloadData.room.roomId === parseInt(roomId)) {
-      switch (payloadData.type) {
-        case 'TALK':
-          dispatch(ADD_CHAT({ ...payloadData, roomId: roomId }));
-          prepareScroll();
-          break;
-        default:
-          break;
-      }
-    }
+    console.log(payloadData);
+    // if (payloadData.room.roomId === parseInt(roomId)) {
+    //   switch (payloadData.type) {
+    //     case 'TALK':
+    //       dispatch(ADD_CHAT({ ...payloadData, roomId: roomId }));
+    //       prepareScroll();
+    //       break;
+    //     default:
+    //       break;
+    //   }
+    // }
+    dispatch(ADD_CHAT({ ...payloadData, roomId: roomId }));
+    prepareScroll();
   };
 
   //! Mount시 구독 && Dismount시 구독 해지
@@ -107,7 +105,7 @@ export default function Room({ roomId }) {
       if (stompClient !== undefined) {
         if (stompClient.connected) {
           stompClient.subscribe(
-            `/topic/chat/room/${roomId}`,
+            `/topic/room/${roomId}/chat`,
             onMessageReceived,
             { id: `sub-${roomId}` }
           ); //? second: callback after subscribe, third: headers
@@ -137,7 +135,7 @@ export default function Room({ roomId }) {
       if (
         channel.data.memberList &&
         channel.data.memberList.findIndex(
-          (member) => member.memberId === user.id
+          (member) => member.memberId === key
         ) !== -1
       ) {
         //console.log('welcome my friend!');
@@ -149,23 +147,14 @@ export default function Room({ roomId }) {
   //! channel 입장 시 채널 데이터 가져오기 && 퇴장시 리덕스 채널 정보 삭제
   const channel = useSelector((state) => state.chat.channel);
   useEffect(() => {
-    if (authorization && refresh_token) {
-      console.log('lets dispatch');
-      dispatch(
-        __getChannel({
-          authorization: authorization,
-          refresh_Token: refresh_token,
-          roomId: roomId,
-        })
-      );
-    }
-
+    //console.log('lets dispatch');
+    dispatch(__getChannel(roomId));
     return () => {
       dispatch(CLEAR_CHANNEL());
     };
   }, [roomId]);
 
-  getOut();
+  //getOut();
   window.setTimeout(scrollUL, 200);
 
   return (
@@ -182,7 +171,7 @@ export default function Room({ roomId }) {
               <div className={styles.imgBox}>
                 <img
                   className={styles.profile_img}
-                  src={user.profilePic ? user.profilePic : placeholderPath}
+                  src={placeholderPath}
                   alt='profile_picture'
                 />
               </div>
@@ -192,15 +181,7 @@ export default function Room({ roomId }) {
                     fontSize: '20px',
                   }}
                 >
-                  {user.nickname}
-                </span>
-                <span
-                  style={{
-                    fontSize: '13px',
-                    color: 'var(--color-light-black)',
-                  }}
-                >
-                  {user.hashtag}
+                  {nickname}
                 </span>
               </div>
             </div>
@@ -219,16 +200,16 @@ export default function Room({ roomId }) {
             style={{ maxHeight: chatboxHeight }}
           >
             <div className={styles.firstChat}>
-              <h2>{channel.data.roomName} 채널에</h2>
+              <h2>{channel.data.name} 채널에</h2>
               <h2>오신 것을 환영합니다</h2>
               <p>이 채널이 시작된 곳이에요.</p>
             </div>
 
             {/* 특정 채털의 chat list mapping */}
             {/* <Chat /> */}
-            {chats.data[roomId] &&
-              chats.data[roomId].map((chat) => (
-                <Chat key={chat.id} chat={chat} />
+            {chats.data &&
+              chats.data.map((chat) => (
+                <Chat key={chat.timestamp} chat={chat} />
               ))}
           </ul>
 
@@ -244,7 +225,7 @@ export default function Room({ roomId }) {
               <input
                 className={styles.input}
                 type='text'
-                placeholder='{채널명예정}에 메시지 보내기'
+                placeholder={`${channel.data.name}에 메시지 보내기`}
                 value={chatInput}
                 onChange={chatInputHandler}
               />

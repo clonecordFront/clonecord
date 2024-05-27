@@ -11,10 +11,12 @@ const Router = () => {
     <BrowserRouter>
       <Routes>
         <Route path='/' element={<MainPage />} />
+        <Route path='/channel/:id' element={<ChatPage />} />
+        <Route path='/invite/:id' element={<InvitePage />} />
 
         <Route element={<PrivateRoute />}>
-          <Route path='/channel/:id' element={<ChatPage />} />
-          <Route path='/invite/:id' element={<InvitePage />} />
+          {/* <Route path='/channel/:id' element={<ChatPage />} />
+          <Route path='/invite/:id' element={<InvitePage />} /> */}
         </Route>
 
         {/* <Route path='*' element={<MainPage />} /> */}

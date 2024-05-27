@@ -1,48 +1,46 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
 import Layout from '../../components/common/layout/Layout';
 import styles from './MainPage.module.css';
-import LoginPage from '../loginPage/LoginPage';
-import Join from '../../components/join/Join';
-import { __memberLogout } from '../../redux/modules/LoginSlice';
-import { useDispatch } from 'react-redux';
-import { indexOf } from 'lodash';
+import { logout } from '../../redux/modules/NameSlice';
+import { useDispatch, useSelector } from 'react-redux';
 import { DarkProvider } from '../../context/DarkmodeContext';
 import { TabContext } from '../../context/TabContext ';
+import NamePage from '../namePage/NamePage';
 
 export default function MainPage() {
   const dispatch = useDispatch();
   const { tab, setTab } = useContext(TabContext);
+  const [nickname, setNickname] = useState(
+    JSON.parse(sessionStorage.getItem('UserNickname'))
+  );
+  const [key, setKey] = useState(JSON.parse(sessionStorage.getItem('UserKey')));
+
   useEffect(() => {
     setTab('main');
-  }, []);
+    const handleStorageChange = (event) => {
+      if (event.key === 'UserNickname') {
+        setNickname(JSON.parse(event.newValue));
+      }
+    };
 
-  const loginuser = useSelector((state) => state.user.user);
-
-  const [inSignup, setInSignup] = useState(false);
-
-  const authorization = sessionStorage.getItem('Authorization');
-  const refresh_token = sessionStorage.getItem('Refresh-Token');
-
-  const userName = JSON.parse(sessionStorage.getItem('User'));
+    window.addEventListener('storage', handleStorageChange);
+    // 컴포넌트가 언마운트될 때 이벤트 리스너 제거
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, [setTab]);
 
   const onSubmitHandler = (e) => {
     e.preventDefault(e);
-    dispatch(__memberLogout());
+    dispatch(logout());
+    setNickname(null);
+    setKey(null);
   };
 
-  const LoginForm = () => {
+  const NameForm = () => {
     return (
       <>
-        <LoginPage setInSignup={setInSignup} />
-      </>
-    );
-  };
-
-  const SignupForm = () => {
-    return (
-      <>
-        <Join setInSignup={setInSignup} />
+        <NamePage setNickname2={setNickname} />
       </>
     );
   };
@@ -52,7 +50,7 @@ export default function MainPage() {
       <div className={styles.mainbox}>
         <div className={styles.box}>
           <h2>99cord에 오신것을 환영합니다!</h2>
-          <h3>'{userName.nickname}'의 친구들이 기다리고 있어요.</h3>
+          <h3>'{nickname}'님의 친구들이 기다리고 있어요.</h3>
           <div className={styles.buttonbox}>
             <button className={styles.logoutbutton} onClick={onSubmitHandler}>
               로그아웃
@@ -67,13 +65,7 @@ export default function MainPage() {
     <Layout>
       <DarkProvider>
         <div className={styles.container}>
-          {authorization && refresh_token ? (
-            <MainForm />
-          ) : inSignup ? (
-            <SignupForm />
-          ) : (
-            <LoginForm />
-          )}
+          {nickname ? <MainForm /> : <NameForm />}
         </div>
       </DarkProvider>
     </Layout>
