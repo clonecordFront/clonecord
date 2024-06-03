@@ -30,6 +30,8 @@ function VideoWrapper({ stream }) {
   ) 
 }
 
+let prev_roomId = undefined;
+
 export default function Room({ roomId, stream }) {
   const { stompClient } = useContext(StompContext);
   const { isUserDisplay } = useContext(UserDisplayContext);
@@ -101,6 +103,10 @@ export default function Room({ roomId, stream }) {
   //! Mount시 구독 && Dismount시 구독 해지
   useEffect(() => {
     setParticipants([]);
+    if(prev_roomId){
+      stompClient.send(`/app/room/${prev_roomId}/disconnect`, {}, JSON.stringify({nickname: nickname, key: key}));
+    }
+    prev_roomId = roomId;
 
     //? setTimeout으로 stompClient의 connected가 true가 되는것을 기다린 후 특정 채널 구독
     window.setTimeout(() => {
@@ -149,6 +155,17 @@ export default function Room({ roomId, stream }) {
           );
           stompClient.send(`/topic/room/${roomId}/key/req`, {}, JSON.stringify({nickname: nickname, key: key}));
 
+          stompClient.subscribe(
+            `/topic/room/${roomId}/disconnect`,
+            msg => {
+              const data = JSON.parse(msg.body);
+              setParticipants(state => {
+                return state.filter(p => p.key !== data.key);
+              });
+            },
+            {id: `sub-disconnect-${roomId}`}
+          )
+
         } else {
           console.log('Stomp not connected yet...');
         }
@@ -166,7 +183,7 @@ export default function Room({ roomId, stream }) {
         stompClient.unsubscribe(`sub-${roomId}`);
         stompClient.unsubscribe(`sub-res-${roomId}`);
         stompClient.unsubscribe(`sub-req-${roomId}`);
-        setParticipants([]);
+        stompClient.unsubscribe(`sub-disconnect-${roomId}`);
       }
     };
   }, [stompClient, roomId]);
