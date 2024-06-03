@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useRef } from 'react';
 import { debounce } from 'lodash';
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -22,10 +22,14 @@ import placeholderPath from '../../../img/profile_placeholder.png';
 import User from '../user/User';
 import { useNavigate } from 'react-router-dom';
 
-function VideoWrapper({ stream }) {
+function VideoWrapper({ stream, user_key }) {
+  const videoRef = useRef(null);
+  useEffect(()=>{
+    videoRef.current.srcObject = stream; 
+  },[])
   return (
-    <div className={styles.videoWrapper}>
-      <video className={styles.video} src={stream}/>
+    <div key={user_key} className={styles.videoWrapper}>
+      <video className={styles.video} ref={videoRef} autoPlay/>
     </div>
   ) 
 }
@@ -210,6 +214,10 @@ export default function Room({ roomId, setIsRoomWaiting, stream }) {
   useEffect(() => {
     //console.log('lets dispatch');
     dispatch(__getChannel(roomId));
+
+    // add local stream
+    setVideos(videos => [...videos, <VideoWrapper stream={stream} key={key}/>])
+
     return () => {
       dispatch(CLEAR_CHANNEL());
     };
@@ -217,6 +225,11 @@ export default function Room({ roomId, setIsRoomWaiting, stream }) {
 
   //getOut();
   window.setTimeout(scrollUL, 200);
+
+  // video chat logic
+  const [videos, setVideos] = useState([]);
+  
+  
 
   return (
     <section className={styles.container}>
@@ -275,8 +288,8 @@ export default function Room({ roomId, setIsRoomWaiting, stream }) {
             </div>
           </div>
         </div>
-        <div className={styles.video}>
-          helloworld
+        <div className={styles.videoChat}>
+          {videos}
         </div>
 
         <div className={styles.chat}>
