@@ -22,7 +22,15 @@ import placeholderPath from '../../../img/profile_placeholder.png';
 import User from '../user/User';
 import { useNavigate } from 'react-router-dom';
 
-export default function Room({ roomId }) {
+function VideoWrapper({ stream }) {
+  return (
+    <div className={styles.videoWrapper}>
+      <video className={styles.video} src={stream}/>
+    </div>
+  ) 
+}
+
+export default function Room({ roomId, stream }) {
   const { stompClient } = useContext(StompContext);
   const { isUserDisplay } = useContext(UserDisplayContext);
   const { tab, setTab } = useContext(TabContext);
@@ -253,6 +261,9 @@ export default function Room({ roomId }) {
             </div>
           </div>
         </div>
+        <div className={styles.video}>
+          helloworld
+        </div>
 
         <div className={styles.chat}>
           <ul
@@ -294,21 +305,6 @@ export default function Room({ roomId }) {
           </div>
         </div>
 
-        <div
-          className={styles.user}
-          style={{ width: isUserDisplay ? '170px' : '0px' }}
-        >
-          <span className={styles.userListText}>온라인 - 0</span>
-          <ul>
-            {channel.data.memberList &&
-              channel.data.memberList.map((user) => {
-                return <User key={user.memberId} user={user} />;
-              })}
-          </ul>
-
-          <span className={styles.userListText}>오프라인 - 0</span>
-          <ul>{/* <User /> */}</ul>
-        </div>
       </div>
     </section>
   );

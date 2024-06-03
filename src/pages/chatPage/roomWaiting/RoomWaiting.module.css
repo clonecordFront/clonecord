@@ -56,17 +56,13 @@
   justify-content: space-between;
 }
 
-.video {
-  flex: 1;
-  padding: 10px;
-}
-
 .chat {
   height: 100%;
-  width: 350px;
+  flex: 1;
 
   display: flex;
   flex-flow: column nowrap;
+  align-items: center;
 
   min-width: 170px;
 }
@@ -179,10 +175,22 @@
 }
 
 .videoWrapper {
-    
+  display: flex;
+  justify-content: center;
+  padding: 10px;
 }
 
 .video {
-  width: 300px;
-  height: 200px;
+  width: 400px;
+  height: 300px;
+
+}
+
+.formButton {
+  background-color: var(--color-black);
+  color: var(--color-white);
+  border-radius: 3px;
+  margin-left: 5px;
+  padding: 5px;
+  width: 400px;
 }
