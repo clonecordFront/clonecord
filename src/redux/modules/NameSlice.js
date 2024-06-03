@@ -6,7 +6,7 @@ export const __nameLogin = createAsyncThunk(
   'NAME_LOGIN',
   async (arg, thunkAPI) => {
     try {
-      const { data } = await instance.post(`/api/v1/user`);
+      const { data } = await instance.post(`/api/v1/user`, {name: arg.nickname});
       data.nickname = arg.nickname;
       return thunkAPI.fulfillWithValue(data);
     } catch (error) {

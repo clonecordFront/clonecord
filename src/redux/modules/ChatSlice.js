@@ -140,6 +140,26 @@ export const chatSlice = createSlice({
         state.chats.data = [action.payload];
       }
     },
+    /* 소켓으로부터 받은 채널 컨트롤 : 채널 추가 */
+    ADD_CHANNEL: (state, action) => {
+      if(state.channels.data){
+        state.channels.data = [...state.channels.data, action.payload];
+      }else{
+        state.channels.data = [action.payload];
+      }
+    },
+    /* 소켓으로부터 받은 채널 컨트롤 : 채널 삭제 */
+    DELETE_CHANNEL: (state, action) => {
+      state.channels.data.filter(chn => {chn.id !== action.payload.id});
+    },
+    /* 소켓으로부터 받은 채널 컨트롤 : 채널 이름 변경 */
+    UPDATE_CHANNEL: (state, action) => {
+      state.channels.data.forEach(chn => {
+        if(chn.id === action.payload.id){
+          chn.name = action.payload.name;
+        }
+      })
+    }
   },
   extraReducers: {
     /* 채널 생성 */
@@ -218,6 +238,6 @@ export const chatSlice = createSlice({
   },
 });
 
-export const { CLEAR_CHANNELS, CLEAR_CHANNEL, CLEAR_CHATS, ADD_CHAT } =
+export const { CLEAR_CHANNELS, CLEAR_CHANNEL, CLEAR_CHATS, ADD_CHAT, ADD_CHANNEL, DELETE_CHANNEL, UPDATE_CHANNEL } =
   chatSlice.actions;
 export default chatSlice.reducer;
