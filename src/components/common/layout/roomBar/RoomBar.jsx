@@ -12,7 +12,7 @@ import {
 import { CLEAR_CHANNELS } from '../../../../redux/modules/ChatSlice';
 import { TabContext } from '../../../../context/TabContext ';
 
-export default function RoomBar() {
+export default function RoomBar({setIsRoomWaiting}) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const channels = useSelector((state) => state.chat.channels);
@@ -68,6 +68,9 @@ export default function RoomBar() {
                   }`}
                   onClick={() => {
                     setTab(channel.id);
+                    if(setIsRoomWaiting){
+                      setIsRoomWaiting(true);
+                    }
                     navigate(`/channel/${channel.id}`);
                   }}
                 >

@@ -32,7 +32,7 @@ function VideoWrapper({ stream }) {
 
 let prev_roomId = undefined;
 
-export default function Room({ roomId, stream }) {
+export default function Room({ roomId, setIsRoomWaiting, stream }) {
   const { stompClient } = useContext(StompContext);
   const { isUserDisplay } = useContext(UserDisplayContext);
   const { tab, setTab } = useContext(TabContext);
