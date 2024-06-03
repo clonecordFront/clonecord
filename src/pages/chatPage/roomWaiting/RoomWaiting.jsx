@@ -89,16 +89,6 @@ export default function RoomWaiting({ roomId, setIsRoomWaiting, setStream }) {
           className={styles.user}
           style={{ width: isUserDisplay ? '170px' : '0px' }}
         >
-          <span className={styles.userListText}>온라인 - 0</span>
-          <ul>
-            {channel.data.memberList &&
-              channel.data.memberList.map((user) => {
-                return <User key={user.memberId} user={user} />;
-              })}
-          </ul>
-
-          <span className={styles.userListText}>오프라인 - 0</span>
-          <ul>{/* <User /> */}</ul>
         </div>
       </div>
     </section>
