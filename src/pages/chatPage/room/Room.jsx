@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useRef } from 'react';
 import { debounce } from 'lodash';
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 import useInput from '../../../hooks/useInput';
 import { UserDisplayContext } from '../../../context/UserDisplayContext';
@@ -20,7 +21,6 @@ import {
 
 import placeholderPath from '../../../img/profile_placeholder.png';
 import User from '../user/User';
-import { useNavigate } from 'react-router-dom';
 
 function VideoWrapper({ stream, user_key }) {
   const videoRef = useRef(null);
@@ -29,17 +29,19 @@ function VideoWrapper({ stream, user_key }) {
   },[])
   return (
     <div key={user_key} className={styles.videoWrapper}>
-      <video className={styles.video} ref={videoRef} autoPlay/>
+      <video className={styles.video} ref={videoRef} id={user_key} autoPlay/>
     </div>
   ) 
 }
 
 let prev_roomId = undefined;
 
-export default function Room({ roomId, setIsRoomWaiting, stream }) {
+export default function Room({ roomId, setIsRoomWaiting, stream, setStream }) {
   const { stompClient } = useContext(StompContext);
   const { isUserDisplay } = useContext(UserDisplayContext);
   const { tab, setTab } = useContext(TabContext);
+
+  const navigate = useNavigate();
 
   const nickname = JSON.parse(sessionStorage.getItem('UserNickname'));
   const key = JSON.parse(sessionStorage.getItem('UserKey'));
@@ -231,7 +233,6 @@ export default function Room({ roomId, setIsRoomWaiting, stream }) {
   }, [stompClient, roomId]);
 
   //* 권한 없는 유저 쫓아내기
-  const navigate = useNavigate();
   const getOut = () => {
     window.setTimeout(() => {
       if (
@@ -254,7 +255,7 @@ export default function Room({ roomId, setIsRoomWaiting, stream }) {
     dispatch(__getChannel(roomId));
 
     // add local stream
-    setVideos(videos => [...videos, <VideoWrapper stream={stream} key={key}/>])
+    setVideos(videos => [...videos, <VideoWrapper stream={stream} user_key={key}/>])
 
     return () => {
       dispatch(CLEAR_CHANNEL());
@@ -320,9 +321,27 @@ export default function Room({ roomId, setIsRoomWaiting, stream }) {
               </div>
             </div>
             <div className={styles.profileBtnSet}>
-              <i className='fa-solid fa-microphone'></i>
-              <i className='fa-solid fa-headphones'></i>
-              <i className='fa-solid fa-gear'></i>
+              <a href="/" style={{color: "black"}}><i className='fa-solid fa-phone-slash'></i></a>
+              <a href="#" style={{color: "black"}} onClick={e => {
+                  const tracks = stream.getTracks();
+                  tracks.forEach(track => {
+                    track.stop();
+                  });
+              }}>
+                <i className='fa-solid fa-video-slash'></i>
+              </a>
+              <a href="#" style={{color: "black"}} onClick={e => {
+                navigator.mediaDevices.getUserMedia({video: true, audio: true})
+                .then(st => {
+                  setStream(st);
+                  const v = document.getElementById(key);
+                  v.srcObject = st;
+                })
+                .catch(err => console.log(err));
+              }}>
+                <i className='fa-solid fa-video'></i>
+              </a>
+              {/* <i className='fa-solid fa-gear'></i> */}
             </div>
           </div>
         </div>
