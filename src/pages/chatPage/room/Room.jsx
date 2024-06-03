@@ -94,16 +94,6 @@ export default function Room({ roomId, stream }) {
     console.log('Received!');
     const payloadData = JSON.parse(payload.body);
     console.log(payloadData);
-    // if (payloadData.room.roomId === parseInt(roomId)) {
-    //   switch (payloadData.type) {
-    //     case 'TALK':
-    //       dispatch(ADD_CHAT({ ...payloadData, roomId: roomId }));
-    //       prepareScroll();
-    //       break;
-    //     default:
-    //       break;
-    //   }
-    // }
     dispatch(ADD_CHAT({ ...payloadData, roomId: roomId }));
     prepareScroll();
   };
@@ -131,8 +121,11 @@ export default function Room({ roomId, stream }) {
             `/topic/room/${roomId}/key/res`,
             msg => {
               const data = JSON.parse(msg.body);
-              if(data.key !== key && !participants.some(p => p.key === data.key)){ setParticipants(state => {
-                return [...state, data];
+              if(data.key !== key){ 
+                setParticipants(state => {
+                  if(!state.some(p => p.key === data.key))
+                    return [...state, data];
+                  else return [...state];
               }); }
             },
             {id: `sub-res-${roomId}`}
@@ -143,8 +136,12 @@ export default function Room({ roomId, stream }) {
             `/topic/room/${roomId}/key/req`,
             msg => {
               const data = JSON.parse(msg.body);
-              if(data.key !== key && !participants.some(p => p.key === data.key)) { setParticipants(state => {
-                return [...state, data];
+              if(data.key !== key){ 
+                setParticipants(state => {
+                  if(!state.some(p => p.key === data.key)){
+                    return [...state, data];
+                  }
+                  else return [...state];
               }); }
               stompClient.send(`/topic/room/${roomId}/key/res`, {}, JSON.stringify({nickname: nickname, key: key}));
             },
