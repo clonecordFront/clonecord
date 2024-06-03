@@ -41,9 +41,9 @@ export function StompProvider({ children }) {
       };
 
       
-      if(data.type === 0) dispatch(ADD_CHANNEL(payload)); // room create
-      else if(data.type === 1) dispatch(DELETE_CHANNEL(payload)); // room delete
-      else if (data.type === 2) dispatch(UPDATE_CHANNEL(payload)); // room update
+      if(data.type === "ROOM_CREATE") dispatch(ADD_CHANNEL(payload)); // room create
+      else if(data.type === "ROOM_DELETE") dispatch(DELETE_CHANNEL(payload)); // room delete
+      else if (data.type === "ROOM_UPDATE") dispatch(UPDATE_CHANNEL(payload)); // room update
     });
 
       
