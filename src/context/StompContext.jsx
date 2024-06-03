@@ -34,7 +34,7 @@ export function StompProvider({ children }) {
   const onConnected = () => {
     /* topic/common subscribe 공통적으로 받아야 하는 정보 받기 위해서 구독하고 redux에 정보 업데이트 */
     stompClient.subscribe('/topic/common', msg => {
-      const data = JSON.parse(msg);
+      const data = JSON.parse(msg.body);
       const payload = {
         id: data.id,
         name: data.name
