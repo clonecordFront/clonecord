@@ -30,6 +30,8 @@ export default function Room({ roomId }) {
   const nickname = JSON.parse(sessionStorage.getItem('UserNickname'));
   const key = JSON.parse(sessionStorage.getItem('UserKey'));
 
+  const [participants, setParticipants] = useState([]);
+
   // TODO: 브라우저 화면 크기에따른 크기 조절 & 마운트 시 스크롤 아래로
   const [chatboxHeight, setChatboxHeight] = useState(
     window.innerHeight - 25 - 60 - 3 - 60
@@ -100,15 +102,48 @@ export default function Room({ roomId }) {
 
   //! Mount시 구독 && Dismount시 구독 해지
   useEffect(() => {
+    setParticipants([]);
+
     //? setTimeout으로 stompClient의 connected가 true가 되는것을 기다린 후 특정 채널 구독
     window.setTimeout(() => {
       if (stompClient !== undefined) {
         if (stompClient.connected) {
+          
+          // subscribe for chatting
           stompClient.subscribe(
             `/topic/room/${roomId}/chat`,
             onMessageReceived,
             { id: `sub-${roomId}` }
           ); //? second: callback after subscribe, third: headers
+
+          // subscribe for webrtc
+
+          // subscribe for user list exchange
+          stompClient.subscribe(
+            `/topic/room/${roomId}/key/res`,
+            msg => {
+              const data = JSON.parse(msg.body);
+              if(data.key !== key && !participants.some(p => p.key === data.key)){ setParticipants(state => {
+                return [...state, data];
+              }); }
+            },
+            {id: `sub-res-${roomId}`}
+          );
+
+          // subscribe for user list exchange
+          stompClient.subscribe(
+            `/topic/room/${roomId}/key/req`,
+            msg => {
+              const data = JSON.parse(msg.body);
+              if(data.key !== key && !participants.some(p => p.key === data.key)) { setParticipants(state => {
+                return [...state, data];
+              }); }
+              stompClient.send(`/topic/room/${roomId}/key/res`, {}, JSON.stringify({nickname: nickname, key: key}));
+            },
+            {id: `sub-req-${roomId}`}
+          );
+          stompClient.send(`/topic/room/${roomId}/key/req`, {}, JSON.stringify({nickname: nickname, key: key}));
+
         } else {
           console.log('Stomp not connected yet...');
         }
@@ -124,6 +159,9 @@ export default function Room({ roomId }) {
         stompClient.connected
       ) {
         stompClient.unsubscribe(`sub-${roomId}`);
+        stompClient.unsubscribe(`sub-res-${roomId}`);
+        stompClient.unsubscribe(`sub-req-${roomId}`);
+        setParticipants([]);
       }
     };
   }, [stompClient, roomId]);
@@ -144,6 +182,7 @@ export default function Room({ roomId }) {
       }
     }, 500);
   };
+
   //! channel 입장 시 채널 데이터 가져오기 && 퇴장시 리덕스 채널 정보 삭제
   const channel = useSelector((state) => state.chat.channel);
   useEffect(() => {
@@ -165,7 +204,29 @@ export default function Room({ roomId }) {
 
       <div className={styles.channelBox}>
         <div className={styles.voice}>
-          <div className={styles.voiceList}>VOICE CHANNEL</div>
+          <div className={styles.voiceList}>Participants</div>
+          {participants.map((data) => (
+            <div className={styles.profileInfo} key={data.key}>
+              <div className={styles.imgBox}>
+                <img
+                  className={styles.profile_img}
+                  src={placeholderPath}
+                  alt='profile_picture'
+                />
+              </div>
+
+              <div className={styles.fullName}>
+                <span
+                  style={{
+                    fontSize: '20px',
+                  }}
+                >
+                  {data.nickname}
+                </span>
+              </div>
+            </div>
+          ))}
+
           <div className={styles.profile}>
             <div className={styles.profileInfo}>
               <div className={styles.imgBox}>
