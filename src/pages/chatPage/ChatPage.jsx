@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 // import SockJS from 'sockjs-client';
 // import { over } from 'stompjs';
@@ -14,9 +14,9 @@ export default function ChatPage() {
   const [stream, setStream] = useState(null);
 
   return (
-    <Layout>
+    <Layout setIsRoomWaiting={setIsRoomWaiting}>
       <UserDisplayProvider>
-        { isRoomWaiting ? <RoomWaiting roomId={id} setIsRoomWaiting={setIsRoomWaiting} setStream={setStream}/> : <Room roomId={id} stream={stream}/> }
+        { isRoomWaiting ? <RoomWaiting roomId={id} setIsRoomWaiting={setIsRoomWaiting} setStream={setStream}/> : <Room roomId={id} setIsRoomWaiting={setIsRoomWaiting} stream={stream}/> }
       </UserDisplayProvider>
     </Layout>
   );
