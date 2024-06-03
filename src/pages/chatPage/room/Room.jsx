@@ -41,6 +41,7 @@ export default function Room({ roomId, stream }) {
   const key = JSON.parse(sessionStorage.getItem('UserKey'));
 
   const [participants, setParticipants] = useState([]);
+  const [connections, setConnections] = useState([]);
 
   // TODO: 브라우저 화면 크기에따른 크기 조절 & 마운트 시 스크롤 아래로
   const [chatboxHeight, setChatboxHeight] = useState(
@@ -103,6 +104,8 @@ export default function Room({ roomId, stream }) {
   //! Mount시 구독 && Dismount시 구독 해지
   useEffect(() => {
     setParticipants([]);
+    setConnections([]);
+
     if(prev_roomId){
       stompClient.send(`/app/room/${prev_roomId}/disconnect`, {}, JSON.stringify({nickname: nickname, key: key}));
     }
@@ -119,8 +122,6 @@ export default function Room({ roomId, stream }) {
             onMessageReceived,
             { id: `sub-${roomId}` }
           ); //? second: callback after subscribe, third: headers
-
-          // subscribe for webrtc
 
           // subscribe for user list exchange
           stompClient.subscribe(
@@ -162,10 +163,45 @@ export default function Room({ roomId, stream }) {
               setParticipants(state => {
                 return state.filter(p => p.key !== data.key);
               });
+              setConnections(state => {
+                return state.filter(s => s.key !== data.key);
+              })
             },
             {id: `sub-disconnect-${roomId}`}
+          );
+
+          // subscribe for webrtc
+          stompClient.subscribe(
+            `/topic/room/${roomId}/answer/${key}`,
+            msg => {
+              const data = JSON.parse(msg.body);
+              if(data.key !== key){
+                setConnections(s => {
+                  if(!s.some(ss => ss.key === data.key)){
+                    return [...s, data];
+                  }else return s;
+                });
+              }
+            },
+            {id: `sub-answer-${roomId}`}
           )
 
+          stompClient.subscribe(
+            `/topic/room/${roomId}/offer/${key}`,
+            msg => {
+              const data = JSON.parse(msg.body);
+              if(data.key !== key){
+                setConnections(s => {
+                  if(!s.some(ss => ss.key === data.key)){
+                    return [...s, data];
+                  }else return s;
+                });
+              }
+
+              stompClient.send(`/app/room/${roomId}/answer/${data.key}`, {}, JSON.stringify({}))
+            },
+            {id: `sub-offer-${roomId}`}
+          )
         } else {
           console.log('Stomp not connected yet...');
         }
@@ -184,6 +220,8 @@ export default function Room({ roomId, stream }) {
         stompClient.unsubscribe(`sub-res-${roomId}`);
         stompClient.unsubscribe(`sub-req-${roomId}`);
         stompClient.unsubscribe(`sub-disconnect-${roomId}`);
+        stompClient.unsubscribe(`sub-offer-${roomId}`);
+        stompClient.unsubscribe(`sub-answer-${roomId}`);
       }
     };
   }, [stompClient, roomId]);
@@ -322,4 +360,35 @@ export default function Room({ roomId, stream }) {
       </div>
     </section>
   );
+}
+
+const iceServers = {
+  iceServers: [
+      {
+          urls: 'stun:stun.l.google.com:19302',
+      },
+      {
+          urls: "turn:turn.argnmp.com:3478",
+          username: "hycord",
+          credential: "hycord4321",
+      },
+  ]
+};
+
+const createConn = (stompClient, roomId, remoteKey, myKey) => {
+  const conn = new RTCPeerConnection(iceServers);
+
+  conn.addEventListener('icecandidate', e => {
+    if(e.candidate !== null){
+      stompClient.send(`/app/room/${roomId}/ice/${remoteKey}`, {}, JSON.stringify({key: myKey, data: e.candidate}));
+    }
+  });
+
+  conn.addEventListener('connectionstatechange', e => {
+
+  });
+
+  conn.addEventListener('track', e => {
+
+  })
 }
