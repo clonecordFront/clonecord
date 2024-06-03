@@ -24,10 +24,11 @@ export function StompProvider({ children }) {
     event.preventDefault();
     event.returnValue = '';
 
-    stompClient.publish({
-      destination: '/app/disconnect',
-      body: JSON.stringify({uuid: user.data.key}),
-    });
+    stompClient.send(
+      '/app/disconnect',
+      {},
+      JSON.stringify({uuid: user.data.key})
+    );
   }
 
   const onConnected = () => {
