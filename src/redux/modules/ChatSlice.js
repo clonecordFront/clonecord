@@ -150,7 +150,7 @@ export const chatSlice = createSlice({
     },
     /* 소켓으로부터 받은 채널 컨트롤 : 채널 삭제 */
     DELETE_CHANNEL: (state, action) => {
-      state.channels.data.filter(chn => {chn.id !== action.payload.id});
+      state.channels.data = state.channels.data.filter(chn => {chn.id !== action.payload.id});
     },
     /* 소켓으로부터 받은 채널 컨트롤 : 채널 이름 변경 */
     UPDATE_CHANNEL: (state, action) => {
