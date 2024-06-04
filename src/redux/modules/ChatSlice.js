@@ -159,6 +159,9 @@ export const chatSlice = createSlice({
           chn.name = action.payload.name;
         }
       })
+      if(state.channel.data.id === action.payload.id){
+        state.channel.data.name = action.payload.name;
+      }
     }
   },
   extraReducers: {
