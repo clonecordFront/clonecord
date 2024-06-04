@@ -272,6 +272,14 @@ export default function Room({ roomId, setIsRoomWaiting, stream, setStream }) {
 
   //! channel 입장 시 채널 데이터 가져오기 && 퇴장시 리덕스 채널 정보 삭제
   const channel = useSelector((state) => state.chat.channel);
+  const channels = useSelector((state) => state.chat.channels);
+  useEffect(()=>{
+    console.log(channels, channel); 
+    if(!channels.data.some(c => c.id === channel.data.id)){
+      navigate('/');
+    }
+  },[channels])
+
   useEffect(() => {
     //console.log('lets dispatch');
     dispatch(__getChannel(roomId));
@@ -284,6 +292,10 @@ export default function Room({ roomId, setIsRoomWaiting, stream, setStream }) {
 
     return () => {
       dispatch(CLEAR_CHANNEL());
+      stompClient.send(`/topic/room/${roomId}/disconnect`, {}, JSON.stringify({key: key}));
+      stream.getTracks().forEach(track => {
+        track.stop(); 
+      })
     };
   }, [roomId]);
 
@@ -312,7 +324,6 @@ export default function Room({ roomId, setIsRoomWaiting, stream, setStream }) {
 
           // setConn({key: p.key, connection: conn});
           setConn(c => [...c, {key: p.key, connection: conn}]);
-          console.log("set conn", connRef.current);
 
           conn.createOffer().then(offer => {
             conn.setLocalDescription(offer);
