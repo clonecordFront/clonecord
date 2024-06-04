@@ -28,8 +28,8 @@ function VideoWrapper({ stream, user_key }) {
     videoRef.current.srcObject = stream; 
   },[])
   return (
-    <div key={user_key} className={styles.videoWrapper}>
-      <video className={styles.video} ref={videoRef} autoPlay/>
+    <div custom={user_key} key={user_key} className={styles.videoWrapper}>
+      <video className={styles.video} ref={videoRef} autoPlay controls/>
     </div>
   ) 
 }
@@ -98,9 +98,7 @@ export default function Room({ roomId, setIsRoomWaiting, stream }) {
 
   // TODO: Stomp Control
   const onMessageReceived = (payload) => {
-    console.log('Received!');
     const payloadData = JSON.parse(payload.body);
-    console.log(payloadData);
     dispatch(ADD_CHAT({ ...payloadData, roomId: roomId }));
     prepareScroll();
   };
@@ -174,38 +172,72 @@ export default function Room({ roomId, setIsRoomWaiting, stream }) {
             {id: `sub-disconnect-${roomId}`}
           );
 
-          // subscribe for webrtc
+          stompClient.subscribe(
+            `/topic/room/${roomId}/offer/${key}`,
+            msg => {
+              const data = JSON.parse(msg.body);
+              let remoteKey = data.key;
+              let remoteDesc = data.desc;
+              let new_conn = createConnnection(stompClient, roomId, remoteKey, key, setVideos, stream);
+              new_conn.setRemoteDescription(new RTCSessionDescription({type: remoteDesc.type, sdp: remoteDesc.sdp}));
+              setConn(conn => {
+                if(!conn.some(c => c.key === remoteKey)){
+                  console.log("setconn");
+                  return [...conn, {key: remoteKey, connection: new_conn}];
+                } 
+              });
+
+              new_conn.createAnswer().then(answer => {
+                stompClient.send(`/app/room/${roomId}/answer/${remoteKey}`, {}, JSON.stringify({
+                  key: key,
+                  desc: answer,
+                }))
+                new_conn.setLocalDescription(answer)
+              })
+              console.log(connRef.current);
+
+            },
+            {id: `sub-offer-${roomId}`}
+          )
+
           stompClient.subscribe(
             `/topic/room/${roomId}/answer/${key}`,
             msg => {
-              const data = JSON.parse(msg.body);
-              if(data.key !== key){
-                setConnections(s => {
-                  if(!s.some(ss => ss.key === data.key)){
-                    return [...s, data];
-                  }else return s;
-                });
-              }
+              let data = JSON.parse(msg.body);
+              let remoteKey = data.key;
+              let remoteDesc = data.desc;
+
+              // because this is the answer from the remote host that local host offered
+              const target_conn = connRef.current.find(c => c.key === remoteKey);
+              console.log("answer from remote", target_conn, connRef.current)
+              target_conn.connection.setRemoteDescription(new RTCSessionDescription(remoteDesc));
             },
             {id: `sub-answer-${roomId}`}
           )
 
           stompClient.subscribe(
-            `/topic/room/${roomId}/offer/${key}`,
+            `/topic/room/${roomId}/ice/${key}`,
             msg => {
-              const data = JSON.parse(msg.body);
-              if(data.key !== key){
-                setConnections(s => {
-                  if(!s.some(ss => ss.key === data.key)){
-                    return [...s, data];
-                  }else return s;
-                });
-              }
+              let data = JSON.parse(msg.body);
+              let remoteKey = data.key;
+              let remoteCand = data.data;
 
-              stompClient.send(`/app/room/${roomId}/answer/${data.key}`, {}, JSON.stringify({}))
+              // because this is the answer from the remote host that local host offered
+              const target_conn = connRef.current.find(c => {
+                return c.key === remoteKey;
+              });
+              console.log(remoteKey, target_conn, connRef.current);
+
+              target_conn.connection.addIceCandidate(new RTCIceCandidate({
+                candidate: remoteCand.candidate,
+                sdpMLineIndex: remoteCand.sdpMLineIndex,
+                sdpMid: remoteCand.sdpMid,
+              }));
+                
             },
-            {id: `sub-offer-${roomId}`}
+            {id: `sub-ice-${roomId}`}
           )
+
         } else {
           console.log('Stomp not connected yet...');
         }
@@ -226,6 +258,7 @@ export default function Room({ roomId, setIsRoomWaiting, stream }) {
         stompClient.unsubscribe(`sub-disconnect-${roomId}`);
         stompClient.unsubscribe(`sub-offer-${roomId}`);
         stompClient.unsubscribe(`sub-answer-${roomId}`);
+        stompClient.unsubscribe(`sub-ice-${roomId}`);
       }
     };
   }, [stompClient, roomId]);
@@ -254,7 +287,10 @@ export default function Room({ roomId, setIsRoomWaiting, stream }) {
     dispatch(__getChannel(roomId));
 
     // add local stream
-    setVideos(videos => [...videos, <VideoWrapper stream={stream} key={key}/>])
+    setVideos(videos => [...videos, {
+      key: key,
+      videoElem: <VideoWrapper stream={stream} key={key}/>
+    }])
 
     return () => {
       dispatch(CLEAR_CHANNEL());
@@ -264,8 +300,43 @@ export default function Room({ roomId, setIsRoomWaiting, stream }) {
   //getOut();
   window.setTimeout(scrollUL, 200);
 
+
   // video chat logic
   const [videos, setVideos] = useState([]);
+  const [conn, setConn] = useState([]);
+  const participantsRef = useRef(null);
+  const videosRef = useRef(null);
+  const connRef = useRef(null);
+  participantsRef.current = participants;
+  videosRef.current = videos;
+  connRef.current = conn;
+
+  useEffect(()=>{
+
+    setTimeout(()=>{
+      const participants = participantsRef.current;
+
+      participants.map((p) => {
+        if(!conn.some(c => p.key === c.key)){
+          let conn = createConnnection(stompClient, roomId, p.key, key, setVideos, stream); 
+
+          // setConn({key: p.key, connection: conn});
+          setConn(c => [...c, {key: p.key, connection: conn}]);
+          console.log("set conn", connRef.current);
+
+          conn.createOffer().then(offer => {
+            conn.setLocalDescription(offer);
+            stompClient.send(`/app/room/${roomId}/offer/${p.key}`, {}, JSON.stringify({
+              key,
+              desc: offer
+            }));
+
+          })
+        }
+      }) 
+    }, 2000);
+
+  },[]);
   
   
 
@@ -327,7 +398,9 @@ export default function Room({ roomId, setIsRoomWaiting, stream }) {
           </div>
         </div>
         <div className={styles.videoChat}>
-          {videos}
+          {videos.map(video => (
+            video.videoElem
+          ))}
         </div>
 
         <div className={styles.chat}>
@@ -375,7 +448,7 @@ export default function Room({ roomId, setIsRoomWaiting, stream }) {
   );
 }
 
-const iceServers = {
+const configuration = {
   iceServers: [
       {
           urls: 'stun:stun.l.google.com:19302',
@@ -388,13 +461,15 @@ const iceServers = {
   ]
 };
 
-const createConn = (stompClient, roomId, remoteKey, myKey) => {
-  const conn = new RTCPeerConnection(iceServers);
+const createConnnection = (stompClient, roomId, remoteKey, myKey, setVideos, localStream) => {
+  const conn = new RTCPeerConnection(configuration);
 
   conn.addEventListener('icecandidate', e => {
+    console.log('icecandidate');
     if(e.candidate !== null){
       stompClient.send(`/app/room/${roomId}/ice/${remoteKey}`, {}, JSON.stringify({key: myKey, data: e.candidate}));
     }
+    console.log('connectionState', conn.connectionState, conn);
   });
 
   conn.addEventListener('connectionstatechange', e => {
@@ -402,6 +477,19 @@ const createConn = (stompClient, roomId, remoteKey, myKey) => {
   });
 
   conn.addEventListener('track', e => {
-
+    console.log("start track", remoteKey, e.streams);
+    setVideos(videos => {
+      const filtered_videos = videos.filter(video => video.key !== remoteKey);
+      return [...filtered_videos, {
+        key: remoteKey,
+        videoElem: <VideoWrapper stream={e.streams[0]} key={remoteKey}/>
+      }];
+    })
+    
   })
+  localStream.getTracks().forEach(track => {
+    conn.addTrack(track, localStream);
+  })
+
+  return conn;
 }
