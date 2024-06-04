@@ -89,26 +89,6 @@ export default function RoomHeader({ channel }) {
         </div>
 
         <div className={styles.search}>
-          {/* search box */}
-          <div className={styles.btnSet}>
-            {/* <i className="fa-solid fa-bell-slash"></i> */}
-            <button className={styles.barBtn}>
-              <i className='fa-solid fa-bell'></i>
-            </button>
-            <button
-              className={styles.barBtn}
-              style={{
-                color: isUserDisplay
-                  ? 'var(--color-light-blue)'
-                  : 'var(--color-black)',
-              }}
-              onClick={toggleIsUserDisplay}
-            >
-              <i className='fa-solid fa-user-group'></i>
-            </button>
-          </div>
-
-          <input type='text' placeholder='검색하기' className={styles.input} />
         </div>
         {dropOpen ? <DropDown /> : null}
       </div>
