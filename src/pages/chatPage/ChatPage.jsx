@@ -16,7 +16,7 @@ export default function ChatPage() {
   return (
     <Layout setIsRoomWaiting={setIsRoomWaiting}>
       <UserDisplayProvider>
-        { isRoomWaiting ? <RoomWaiting roomId={id} setIsRoomWaiting={setIsRoomWaiting} setStream={setStream}/> : <Room roomId={id} setIsRoomWaiting={setIsRoomWaiting} stream={stream}/> }
+        { isRoomWaiting ? <RoomWaiting roomId={id} setIsRoomWaiting={setIsRoomWaiting} setStream={setStream}/> : <Room roomId={id} setIsRoomWaiting={setIsRoomWaiting} stream={stream} setStream={setStream}/> }
       </UserDisplayProvider>
     </Layout>
   );
