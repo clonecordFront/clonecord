@@ -49,7 +49,7 @@ export default function MainPage() {
     return (
       <div className={styles.mainbox}>
         <div className={styles.box}>
-          <h2>99cord에 오신것을 환영합니다!</h2>
+          <h2>hycord에 오신것을 환영합니다!</h2>
           <h3>'{nickname}'님의 친구들이 기다리고 있어요.</h3>
           <div className={styles.buttonbox}>
             <button className={styles.logoutbutton} onClick={onSubmitHandler}>

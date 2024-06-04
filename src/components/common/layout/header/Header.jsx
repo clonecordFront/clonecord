@@ -8,7 +8,7 @@ export default function Header() {
   
   return (
   <div>
-    <div className={styles.box}>99cord</div>
+    <div className={styles.box}>hycord</div>
   </div>
   )
 }

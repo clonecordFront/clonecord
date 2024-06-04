@@ -16,7 +16,7 @@ export function StompProvider({ children }) {
 
   function init() {
     //console.log('Lets try connect!');
-    let sock = new SockJS('https://158.179.171.152/signal');
+    let sock = new SockJS('https://localhost:8443/signal');
     setStompClient(Stomp.over(sock));
   }
 

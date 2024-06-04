@@ -43,7 +43,7 @@ export default function LoginPage({ setInSignup }) {
               className='fa-brands fa-discord fa-3x'
               style={{ color: '#5865fe' }}
             />
-            <div className={styles.text}>99cord</div>
+            <div className={styles.text}>hycord</div>
             <input
               className={styles.loginInput}
               value={email || ''}
