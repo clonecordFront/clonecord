@@ -113,6 +113,10 @@ export default function Room({ roomId, setIsRoomWaiting, stream, setStream }) {
     }
     prev_roomId = roomId;
 
+    const unloadHandler = () => {
+      stompClient.send(`/app/room/${roomId}/disconnect`, {}, JSON.stringify({nickname: nickname, key: key}));
+    }
+
     //? setTimeout으로 stompClient의 connected가 true가 되는것을 기다린 후 특정 채널 구독
     window.setTimeout(() => {
       if (stompClient !== undefined) {
@@ -243,7 +247,7 @@ export default function Room({ roomId, setIsRoomWaiting, stream, setStream }) {
                 
             },
             {id: `sub-ice-${roomId}`}
-          )
+          );
 
         } else {
           console.log('Stomp not connected yet...');
@@ -253,7 +257,12 @@ export default function Room({ roomId, setIsRoomWaiting, stream, setStream }) {
       }
     }, 200);
 
+    
+    window.addEventListener('beforeunload', unloadHandler);
+
     return () => {
+      window.removeEventListener('beforeunload', unloadHandler)
+
       if (
         stompClient !== undefined &&
         stompClient !== null &&
