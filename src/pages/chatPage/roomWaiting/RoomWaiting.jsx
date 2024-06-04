@@ -41,6 +41,7 @@ export default function RoomWaiting({ roomId, setIsRoomWaiting, setStream }) {
 
   const nickname = JSON.parse(sessionStorage.getItem('UserNickname'));
   const key = JSON.parse(sessionStorage.getItem('UserKey'));
+  const [enterState, setEnterState] = useState(false);
 
   // TODO: 채팅 제출 시 이벤트
   const dispatch = useDispatch();
@@ -58,6 +59,7 @@ export default function RoomWaiting({ roomId, setIsRoomWaiting, setStream }) {
     getWebcam((stream)=>{
       videoRef.current.srcObject = stream;
       setStream(stream);
+      setEnterState(true);
     });
     return () => {
       dispatch(CLEAR_CHANNEL());
@@ -79,9 +81,12 @@ export default function RoomWaiting({ roomId, setIsRoomWaiting, setStream }) {
             <div className={styles.videoWrapper}>
               <video className={styles.video} ref={videoRef} autoPlay muted/>
             </div>
-            <button className={styles.formButton} onClick={()=>setIsRoomWaiting(false)} >
-                입장하기
-            </button>
+            {
+              enterState && 
+              <button className={styles.formButton} onClick={()=>setIsRoomWaiting(false)}>
+              입장하기
+              </button>
+            }
       
         </div>
 
