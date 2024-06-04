@@ -22,14 +22,15 @@ import {
 import placeholderPath from '../../../img/profile_placeholder.png';
 import User from '../user/User';
 
-function VideoWrapper({ stream, user_key }) {
+function VideoWrapper({ stream, user_key, name, isMuted }) {
   const videoRef = useRef(null);
   useEffect(()=>{
     videoRef.current.srcObject = stream; 
   },[])
   return (
     <div key={user_key} className={styles.videoWrapper}>
-      <video className={styles.video} ref={videoRef} id={user_key} autoPlay/>
+      <div className={styles.videoName}>{name}</div>
+      <video className={styles.video} ref={videoRef} id={user_key} autoPlay muted={isMuted}/>
     </div>
   ) 
 }
@@ -48,24 +49,22 @@ export default function Room({ roomId, setIsRoomWaiting, stream, setStream }) {
 
   const [participants, setParticipants] = useState([]);
 
-  // TODO: 브라우저 화면 크기에따른 크기 조절 & 마운트 시 스크롤 아래로
+  /*
+    * rendering logic
+    */
   const [chatboxHeight, setChatboxHeight] = useState(
     window.innerHeight - 25 - 60 - 3 - 60
   );
-
   const handleResize = debounce(() => {
     setChatboxHeight(window.innerHeight - 25 - 60 - 3 - 60);
   }, 1000);
-
   function prepareScroll() {
     window.setTimeout(scrollUL, 50);
   }
-
   const scrollUL = () => {
     let chatUL = document.querySelector('#chatUL');
     if (chatUL) chatUL.scrollTo(0, chatUL.scrollHeight);
   };
-
   useEffect(() => {
     //console.log(roomId);
     setTab(roomId);
@@ -75,7 +74,9 @@ export default function Room({ roomId, setIsRoomWaiting, stream, setStream }) {
     };
   }, []);
 
-  // TODO: 채팅 제출 시 이벤트
+  /*
+    * chatting event
+    */
   const dispatch = useDispatch();
   const [chatInput, setChatInput, chatInputHandler] = useInput('');
   const chats = useSelector((state) => state.chat.chats);
@@ -97,7 +98,6 @@ export default function Room({ roomId, setIsRoomWaiting, stream, setStream }) {
     setChatInput('');
   };
 
-  // TODO: Stomp Control
   const onMessageReceived = (payload) => {
     const payloadData = JSON.parse(payload.body);
     dispatch(ADD_CHAT({ ...payloadData, roomId: roomId }));
@@ -185,7 +185,7 @@ export default function Room({ roomId, setIsRoomWaiting, stream, setStream }) {
               const data = JSON.parse(msg.body);
               let remoteKey = data.key;
               let remoteDesc = data.desc;
-              let new_conn = createConnnection(stompClient, roomId, remoteKey, key, setVideos, stream);
+              let new_conn = createConnection(stompClient, roomId, remoteKey, key, setVideos, setParticipants, setConn, stream);
               new_conn.setRemoteDescription(new RTCSessionDescription({type: remoteDesc.type, sdp: remoteDesc.sdp}));
               setConn(conn => {
                 if(!conn.some(c => c.key === remoteKey)){
@@ -270,22 +270,6 @@ export default function Room({ roomId, setIsRoomWaiting, stream, setStream }) {
     };
   }, [stompClient, roomId]);
 
-  //* 권한 없는 유저 쫓아내기
-  const getOut = () => {
-    window.setTimeout(() => {
-      if (
-        channel.data.memberList &&
-        channel.data.memberList.findIndex(
-          (member) => member.memberId === key
-        ) !== -1
-      ) {
-        //console.log('welcome my friend!');
-      } else if (channel.data.memberList) {
-        navigate('/');
-      }
-    }, 500);
-  };
-
   //! channel 입장 시 채널 데이터 가져오기 && 퇴장시 리덕스 채널 정보 삭제
   const channel = useSelector((state) => state.chat.channel);
   useEffect(() => {
@@ -295,7 +279,7 @@ export default function Room({ roomId, setIsRoomWaiting, stream, setStream }) {
     // add local stream
     setVideos(videos => [...videos, {
       key: key,
-      videoElem: <VideoWrapper stream={stream} key={key}/>
+      videoElem: <VideoWrapper stream={stream} key={key} name={'내 영상'} isMuted={true}/>
     }])
 
     return () => {
@@ -324,7 +308,7 @@ export default function Room({ roomId, setIsRoomWaiting, stream, setStream }) {
 
       participants.map((p) => {
         if(!conn.some(c => p.key === c.key)){
-          let conn = createConnnection(stompClient, roomId, p.key, key, setVideos, stream); 
+          let conn = createConnection(stompClient, roomId, p.key, key, setVideos, setParticipants, setConn, stream); 
 
           // setConn({key: p.key, connection: conn});
           setConn(c => [...c, {key: p.key, connection: conn}]);
@@ -354,7 +338,7 @@ export default function Room({ roomId, setIsRoomWaiting, stream, setStream }) {
 
       <div className={styles.channelBox}>
         <div className={styles.voice}>
-          <div className={styles.voiceList}>Participants</div>
+          <div className={styles.voiceList}>
           {participants.map((data) => (
             <div className={styles.profileInfo} key={data.key}>
               <div className={styles.imgBox}>
@@ -376,6 +360,7 @@ export default function Room({ roomId, setIsRoomWaiting, stream, setStream }) {
               </div>
             </div>
           ))}
+          </div>
 
           <div className={styles.profile}>
             <div className={styles.profileInfo}>
@@ -401,23 +386,23 @@ export default function Room({ roomId, setIsRoomWaiting, stream, setStream }) {
                 stompClient.send(`/topic/room/${roomId}/disconnect`, {}, JSON.stringify({key: key}));
               }}><i className='fa-solid fa-phone-slash'></i></a>
               <a href="#" style={{color: "black"}} onClick={e => {
-                  const tracks = stream.getTracks();
-                  tracks.forEach(track => {
-                    track.stop();
+                  stream.getTracks().forEach(track => {
+                    if(track.kind == 'video'){
+                      track.enabled = false;
+                    }
                   });
               }}>
                 <i className='fa-solid fa-video-slash'></i>
               </a>
               <a href="#" style={{color: "black"}} onClick={e => {
-                navigator.mediaDevices.getUserMedia({video: true, audio: true})
-                .then(st => {
-                  setStream(st);
-                  const v = document.getElementById(key);
-                  v.srcObject = st;
+                stream.getTracks().forEach(track => {
+                    if(track.kind == 'video'){
+                      track.enabled = true;
+                    }
                 })
-                .catch(err => console.log(err));
               }}>
-                <i className='fa-solid fa-video'></i>
+                <i className='fa-solid fa-video onClick={e => {
+                }}'></i>
               </a>
               {/* <i className='fa-solid fa-gear'></i> */}
             </div>
@@ -487,7 +472,7 @@ const configuration = {
   ]
 };
 
-const createConnnection = (stompClient, roomId, remoteKey, myKey, setVideos, localStream) => {
+const createConnection = (stompClient, roomId, remoteKey, myKey, setVideos, setParticipants, setConn, localStream) => {
   const conn = new RTCPeerConnection(configuration);
 
   conn.addEventListener('icecandidate', e => {
@@ -499,7 +484,30 @@ const createConnnection = (stompClient, roomId, remoteKey, myKey, setVideos, loc
   });
 
   conn.addEventListener('connectionstatechange', e => {
+    switch(conn.connectionState) {
+      case "new":
+      case "connecting":
+      case "connected":
+        break;
+      case "disconnected":
+      case "failed":
+      case "closed":
+        setParticipants(state => {
+          return state.filter(p => p.key !== remoteKey);
+        });
 
+        setConn(c => {
+          const filtered_conns = c.filter(conn => conn.key !== remoteKey);
+          return [...filtered_conns];
+        });
+        setVideos(videos => {
+          const filtered_videos = videos.filter(video => video.key !== remoteKey);
+          return [...filtered_videos];
+        })
+        break;
+      default:
+        break;
+    }
   });
 
   conn.addEventListener('track', e => {

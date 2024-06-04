@@ -66,6 +66,7 @@
   height: 100%;
   width: 400px;
   flex: 0 0;
+  background-color: var(--color-light-white);
 
   display: flex;
   flex-flow: column nowrap;
@@ -121,6 +122,7 @@
 }
 .voiceList {
   flex: 1;
+  padding: 10px;
 }
 .profile {
   background-color: #ebedef;
@@ -137,6 +139,7 @@
   display: flex;
   align-items: center;
   flex: 1;
+  margin-bottom: 10px;
 }
 
 .imgBox {
@@ -182,10 +185,16 @@
 
 .videoWrapper {
   display: inline-block;
-    
+  width: 300px;
+  padding: 10px;
 }
 
 .video {
-  width: 300px;
-  height: 200px;
+  width: 100%;
+  height: auto;
+}
+
+.videoName {
+  font-weight: bold;
+  
 }

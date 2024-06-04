@@ -77,7 +77,7 @@ export default function RoomWaiting({ roomId, setIsRoomWaiting, setStream }) {
 
         <div className={styles.chat}>
             <div className={styles.videoWrapper}>
-              <video className={styles.video} ref={videoRef} autoPlay/>
+              <video className={styles.video} ref={videoRef} autoPlay muted/>
             </div>
             <button className={styles.formButton} onClick={()=>setIsRoomWaiting(false)} >
                 입장하기
