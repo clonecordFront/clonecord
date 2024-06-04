@@ -47,7 +47,6 @@ export default function Room({ roomId, setIsRoomWaiting, stream, setStream }) {
   const key = JSON.parse(sessionStorage.getItem('UserKey'));
 
   const [participants, setParticipants] = useState([]);
-  const [connections, setConnections] = useState([]);
 
   // TODO: 브라우저 화면 크기에따른 크기 조절 & 마운트 시 스크롤 아래로
   const [chatboxHeight, setChatboxHeight] = useState(
@@ -108,7 +107,6 @@ export default function Room({ roomId, setIsRoomWaiting, stream, setStream }) {
   //! Mount시 구독 && Dismount시 구독 해지
   useEffect(() => {
     setParticipants([]);
-    setConnections([]);
 
     if(prev_roomId){
       stompClient.send(`/app/room/${prev_roomId}/disconnect`, {}, JSON.stringify({nickname: nickname, key: key}));
@@ -167,9 +165,16 @@ export default function Room({ roomId, setIsRoomWaiting, stream, setStream }) {
               setParticipants(state => {
                 return state.filter(p => p.key !== data.key);
               });
-              setConnections(state => {
-                return state.filter(s => s.key !== data.key);
+              
+              setConn(c => {
+                const filtered_conns = c.filter(conn => conn.key !== data.key);
+                return [...filtered_conns];
+              });
+              setVideos(videos => {
+                const filtered_videos = videos.filter(video => video.key !== data.key);
+                return [...filtered_videos];
               })
+              
             },
             {id: `sub-disconnect-${roomId}`}
           );
@@ -392,7 +397,9 @@ export default function Room({ roomId, setIsRoomWaiting, stream, setStream }) {
               </div>
             </div>
             <div className={styles.profileBtnSet}>
-              <a href="/" style={{color: "black"}}><i className='fa-solid fa-phone-slash'></i></a>
+              <a href="/" style={{color: "black"}} onClick={e => {
+                stompClient.send(`/topic/room/${roomId}/disconnect`, {}, JSON.stringify({key: key}));
+              }}><i className='fa-solid fa-phone-slash'></i></a>
               <a href="#" style={{color: "black"}} onClick={e => {
                   const tracks = stream.getTracks();
                   tracks.forEach(track => {
